@@ -89,8 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'AI & ML Enthusiast',
             'IoT Developer',
             'Oracle Certified',
-            'Full Stack Learner',
-            'HackShastra Lead'
+            'Full Stack Learner'
         ];
         let phraseIndex = 0;
         let charIndex = 0;
