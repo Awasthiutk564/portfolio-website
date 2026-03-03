@@ -25,36 +25,54 @@ app.use((req, res, next) => {
 });
 
 // ── Database Setup ──
-const db = new Database(path.join(__dirname, 'portfolio.db'));
+let db;
+try {
+    // Vercel's filesystem is read-only. We must use /tmp for the database in production.
+    const dbPath = process.env.NODE_ENV === 'production'
+        ? path.join('/tmp', 'portfolio.db')
+        : path.join(__dirname, 'portfolio.db');
 
-// Enable WAL mode for better performance
-db.pragma('journal_mode = WAL');
+    db = new Database(dbPath);
 
-// Create messages table
-db.exec(`
-    CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        subject TEXT NOT NULL,
-        message TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        read_status INTEGER DEFAULT 0
-    )
-`);
+    // Enable WAL mode for better performance
+    db.pragma('journal_mode = WAL');
 
-// Create chat_logs table for Booglu conversations
-db.exec(`
-    CREATE TABLE IF NOT EXISTS chat_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        session_id TEXT NOT NULL,
-        role TEXT NOT NULL,
-        content TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-`);
+    // Create messages table
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            message TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            read_status INTEGER DEFAULT 0
+        )
+    `);
 
-console.log('✅ Database initialized successfully');
+    // Create chat_logs table for Booglu conversations
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS chat_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    console.log('✅ Database initialized successfully at:', dbPath);
+} catch (dbErr) {
+    console.error('❌ Database failed to initialize:', dbErr.message);
+    console.log('⚠️ Running in "No-DB" mode. Messages will be emailed but not saved.');
+    // Mock the db object so the app doesn't crash on later calls
+    db = {
+        prepare: () => ({
+            run: () => ({ lastInsertRowid: Date.now() }),
+            all: () => []
+        })
+    };
+}
 
 // ── Email Transporter (Gmail SMTP) ──
 const transporter = nodemailer.createTransport({
