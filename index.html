@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utkarsh Awasthi — Tech Explorer | Portfolio</title>
+    <meta name="description"
+        content="Portfolio of Utkarsh Awasthi — 2nd year B.Tech ECE student at SRM University AP, exploring AI, Programming, IoT, and Embedded Systems. Oracle Certified.">
+    <meta name="keywords"
+        content="Utkarsh Awasthi, portfolio, ECE, AI, IoT, Embedded Systems, Full Stack, SRM University">
+    <meta name="author" content="Utkarsh Awasthi">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-outline" id="cursorOutline"></div>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-logo">UA</div>
+            <div class="loader-bar">
+                <div class="loader-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="#hero" class="nav-logo">
+            <span class="logo-text">Utkarsh<span class="logo-accent">.</span></span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="#hero" class="nav-link active" data-section="hero">Home</a>
+            <a href="#about" class="nav-link" data-section="about">About</a>
+            <a href="#experience" class="nav-link" data-section="experience">Experience</a>
+            <a href="#education" class="nav-link" data-section="education">Education</a>
+            <a href="#skills" class="nav-link" data-section="skills">Skills</a>
+            <a href="#gallery" class="nav-link" data-section="gallery">Gallery</a>
+            <a href="#contact" class="nav-link" data-section="contact">Contact</a>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-particles" id="heroParticles"></div>
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge animate-on-scroll">
+                    <span class="badge-dot"></span>
+                    Available for Opportunities
+                </div>
+                <h1 class="hero-title animate-on-scroll">
+                    <span class="hero-greeting">Hello, I'm</span>
+                    <span class="hero-name">Utkarsh Awasthi</span>
+                </h1>
+                <div class="hero-subtitle animate-on-scroll">
+                    <span class="typing-text" id="typingText"></span>
+                    <span class="typing-cursor">|</span>
+                </div>
+                <p class="hero-description animate-on-scroll">
+                    A passionate 2nd year B.Tech ECE student at SRM University AP, diving deep into
+                    <span class="highlight">AI</span>, <span class="highlight">IoT</span>,
+                    <span class="highlight">Embedded Systems</span> & <span class="highlight">Full Stack
+                        Development</span>.
+                </p>
+                <div class="hero-cta animate-on-scroll">
+                    <a href="#contact" class="btn btn-primary">
+                        <span>Get In Touch</span>
+                        <i data-lucide="arrow-right" class="btn-icon"></i>
+                    </a>
+                    <a href="#about" class="btn btn-secondary">
+                        <span>Know More</span>
+                        <i data-lucide="chevron-down" class="btn-icon"></i>
+                    </a>
+                </div>
+                <div class="hero-stats animate-on-scroll">
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="5">0</span><span class="stat-plus">+</span>
+                        <span class="stat-label">Certifications</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="2">0</span><span class="stat-plus">+</span>
+                        <span class="stat-label">Experiences</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-count="3">0</span><span class="stat-plus">+</span>
+                        <span class="stat-label">Domains</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image animate-on-scroll">
+                <div class="hero-image-wrapper">
+                    <div class="hero-image-glow"></div>
+                    <div class="hero-image-border"></div>
+                    <img src="images/hero-portrait.jpg" alt="Utkarsh Awasthi" class="hero-photo">
+                </div>
+                <div class="hero-image-decoration">
+                    <div class="floating-badge badge-1">
+                        <i data-lucide="cpu" class="fb-icon"></i>
+                        <span>ECE</span>
+                    </div>
+                    <div class="floating-badge badge-2">
+                        <i data-lucide="brain" class="fb-icon"></i>
+                        <span>AI</span>
+                    </div>
+                    <div class="floating-badge badge-3">
+                        <i data-lucide="code-2" class="fb-icon"></i>
+                        <span>Code</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
+            </div>
+            <span>Scroll Down</span>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about" id="about">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Introduction</span>
+                <h2 class="section-title">About <span class="gradient-text">Me</span></h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="about-grid">
+                <div class="about-image-col animate-on-scroll">
+                    <div class="about-image-container">
+                        <div class="about-image-frame">
+                            <img src="images/about-profile.jpg" alt="Utkarsh Awasthi at campus" class="about-photo">
+                        </div>
+                        <div class="about-image-shape shape-1"></div>
+                        <div class="about-image-shape shape-2"></div>
+                        <div class="about-experience-badge">
+                            <span class="aeb-number">2+</span>
+                            <span class="aeb-text">Years of<br>Learning</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-content animate-on-scroll">
+                    <h3 class="about-heading">A Tech Explorer on a Mission</h3>
+                    <p class="about-text">
+                        I'm a 2nd year B.Tech Electronics and Communication Engineering student at
+                        <strong>SRM University, AP</strong>, deeply passionate about exploring the
+                        intersection of hardware and software. My journey in tech is driven by curiosity
+                        and a relentless desire to build meaningful solutions.
+                    </p>
+                    <p class="about-text">
+                        My experience spans from working as a fundraising intern at the
+                        <strong>NayePankh Foundation</strong>, where I honed my interpersonal and team skills,
+                        to leading internal affairs at <strong>HackShastra SRMAP</strong>. I've earned an
+                        <strong>AI Agents certification from Oracle University</strong> and continuously
+                        seek opportunities in AI, IoT, embedded systems, and full-stack development.
+                    </p>
+                    <div class="about-info-cards">
+                        <div class="info-card">
+                            <i data-lucide="map-pin" class="info-icon"></i>
+                            <div>
+                                <span class="info-label">Location</span>
+                                <span class="info-value">India</span>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i data-lucide="graduation-cap" class="info-icon"></i>
+                            <div>
+                                <span class="info-label">Degree</span>
+                                <span class="info-value">B.Tech ECE</span>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i data-lucide="mail" class="info-icon"></i>
+                            <div>
+                                <span class="info-label">Email</span>
+                                <span class="info-value">awasthiutk13@gmail.com</span>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i data-lucide="linkedin" class="info-icon"></i>
+                            <div>
+                                <span class="info-label">LinkedIn</span>
+                                <span class="info-value">utkarsh-awasthi-276a92367</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="section experience" id="experience">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Career Path</span>
+                <h2 class="section-title">My <span class="gradient-text">Experience</span></h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item animate-on-scroll">
+                    <div class="timeline-marker">
+                        <div class="timeline-dot active-dot">
+                            <div class="pulse-ring"></div>
+                        </div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-header">
+                            <div class="timeline-badge current">Current</div>
+                            <span class="timeline-date">
+                                <i data-lucide="calendar" class="tl-icon"></i>
+                                December 2025 — Present
+                            </span>
+                        </div>
+                        <h3 class="timeline-title">Internal Affairs Lead</h3>
+                        <h4 class="timeline-company">
+                            <i data-lucide="building-2" class="tl-icon"></i>
+                            HackShastra SRMAP
+                        </h4>
+                        <p class="timeline-location">
+                            <i data-lucide="map-pin" class="tl-icon"></i>
+                            Vijayawada, Andhra Pradesh, India
+                        </p>
+                        <p class="timeline-description">
+                            Leading internal affairs operations, coordinating team activities, and
+                            managing communication channels between departments for hackathon events at SRM AP.
+                        </p>
+                        <div class="timeline-tags">
+                            <span class="timeline-tag">Leadership</span>
+                            <span class="timeline-tag">Event Management</span>
+                            <span class="timeline-tag">Team Coordination</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item animate-on-scroll">
+                    <div class="timeline-marker">
+                        <div class="timeline-dot"></div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-card-header">
+                            <span class="timeline-date">
+                                <i data-lucide="calendar" class="tl-icon"></i>
+                                August 2025 — December 2025
+                            </span>
+                        </div>
+                        <h3 class="timeline-title">Fundraiser</h3>
+                        <h4 class="timeline-company">
+                            <i data-lucide="heart" class="tl-icon"></i>
+                            NayePankh Foundation
+                        </h4>
+                        <p class="timeline-location">
+                            <i data-lucide="map-pin" class="tl-icon"></i>
+                            New Delhi, India
+                        </p>
+                        <p class="timeline-description">
+                            Worked as a fundraising intern, strengthening interpersonal and team skills
+                            while contributing to meaningful social impact initiatives over 5 months.
+                        </p>
+                        <div class="timeline-tags">
+                            <span class="timeline-tag">Fundraising</span>
+                            <span class="timeline-tag">Social Impact</span>
+                            <span class="timeline-tag">Team Skills</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section class="section education" id="education">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Academic Journey</span>
+                <h2 class="section-title">My <span class="gradient-text">Education</span></h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="education-grid">
+                <div class="edu-card animate-on-scroll">
+                    <div class="edu-card-accent"></div>
+                    <div class="edu-card-icon">
+                        <i data-lucide="graduation-cap"></i>
+                    </div>
+                    <div class="edu-card-content">
+                        <div class="edu-period">
+                            <i data-lucide="calendar" class="edu-icon"></i>
+                            August 2024 — August 2028
+                        </div>
+                        <h3 class="edu-degree">Bachelor of Technology, ECE</h3>
+                        <h4 class="edu-institution">
+                            <i data-lucide="building" class="edu-icon"></i>
+                            SRM University, AP
+                        </h4>
+                        <p class="edu-description">
+                            Currently pursuing B.Tech in Electronics and Communication Engineering with focus
+                            on AI, IoT, Embedded Systems, and Full Stack Development.
+                        </p>
+                        <div class="edu-badge">Pursuing</div>
+                    </div>
+                </div>
+
+                <div class="edu-card animate-on-scroll">
+                    <div class="edu-card-accent"></div>
+                    <div class="edu-card-icon">
+                        <i data-lucide="school"></i>
+                    </div>
+                    <div class="edu-card-content">
+                        <div class="edu-period">
+                            <i data-lucide="calendar" class="edu-icon"></i>
+                            April 2022 — May 2023
+                        </div>
+                        <h3 class="edu-degree">Intermediate — Science (Maths)</h3>
+                        <h4 class="edu-institution">
+                            <i data-lucide="building" class="edu-icon"></i>
+                            S. R. Public School
+                        </h4>
+                        <p class="edu-description">
+                            Completed intermediate education with a focus on Science stream (Mathematics),
+                            building a strong foundation in analytical and quantitative skills.
+                        </p>
+                        <div class="edu-badge completed">Completed</div>
+                    </div>
+                </div>
+
+                <div class="edu-card animate-on-scroll">
+                    <div class="edu-card-accent"></div>
+                    <div class="edu-card-icon">
+                        <i data-lucide="book-open"></i>
+                    </div>
+                    <div class="edu-card-content">
+                        <div class="edu-period">
+                            <i data-lucide="calendar" class="edu-icon"></i>
+                            Completed
+                        </div>
+                        <h3 class="edu-degree">High School</h3>
+                        <h4 class="edu-institution">
+                            <i data-lucide="building" class="edu-icon"></i>
+                            Rani Laxmi Bai Memorial School (R.L.B.)
+                        </h4>
+                        <p class="edu-description">
+                            Completed foundational schooling, developing core academic skills and early
+                            interest in science and technology.
+                        </p>
+                        <div class="edu-badge completed">Completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills & Certifications Section -->
+    <section class="section skills" id="skills">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Expertise & Recognition</span>
+                <h2 class="section-title">Skills & <span class="gradient-text">Certifications</span></h2>
+                <div class="section-line"></div>
+            </div>
+
+            <div class="skills-certifications-grid">
+                <!-- Skills Column -->
+                <div class="skills-column animate-on-scroll">
+                    <h3 class="subsection-title">
+                        <i data-lucide="zap" class="sub-icon"></i>
+                        Top Skills
+                    </h3>
+                    <div class="skills-list">
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">Simulink</span>
+                                <span class="skill-level">Advanced</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-bar-fill" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">Generative AI</span>
+                                <span class="skill-level">Advanced</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-bar-fill" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">AI Driven Tools</span>
+                                <span class="skill-level">Advanced</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-bar-fill" data-width="88"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">Programming & AI</span>
+                                <span class="skill-level">Intermediate</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-bar-fill" data-width="75"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">IoT & Embedded</span>
+                                <span class="skill-level">Intermediate</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-bar-fill" data-width="70"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">Full Stack Development</span>
+                                <span class="skill-level">Learning</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-bar-fill" data-width="60"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications Column -->
+                <div class="certifications-column animate-on-scroll">
+                    <h3 class="subsection-title">
+                        <i data-lucide="award" class="sub-icon"></i>
+                        Certifications
+                    </h3>
+                    <div class="cert-list">
+                        <div class="cert-card">
+                            <div class="cert-icon-wrapper">
+                                <i data-lucide="sparkles" class="cert-icon"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4 class="cert-name">Master Generative AI & Get the Gen Z Edge</h4>
+                                <span class="cert-issuer">Professional Course</span>
+                            </div>
+                            <i data-lucide="external-link" class="cert-link-icon"></i>
+                        </div>
+                        <div class="cert-card">
+                            <div class="cert-icon-wrapper">
+                                <i data-lucide="briefcase" class="cert-icon"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4 class="cert-name">Technology Job Simulation</h4>
+                                <span class="cert-issuer">Deloitte Australia</span>
+                            </div>
+                            <i data-lucide="external-link" class="cert-link-icon"></i>
+                        </div>
+                        <div class="cert-card">
+                            <div class="cert-icon-wrapper oracle">
+                                <i data-lucide="bot" class="cert-icon"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4 class="cert-name">Oracle Fusion AI Agent Studio</h4>
+                                <span class="cert-issuer">Oracle University</span>
+                            </div>
+                            <i data-lucide="external-link" class="cert-link-icon"></i>
+                        </div>
+                        <div class="cert-card">
+                            <div class="cert-icon-wrapper">
+                                <i data-lucide="bar-chart-3" class="cert-icon"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4 class="cert-name">AI for Business Professionals</h4>
+                                <span class="cert-issuer">Professional Course</span>
+                            </div>
+                            <i data-lucide="external-link" class="cert-link-icon"></i>
+                        </div>
+                        <div class="cert-card">
+                            <div class="cert-icon-wrapper">
+                                <i data-lucide="terminal" class="cert-icon"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4 class="cert-name">Prompt Engineering with GitHub Copilot</h4>
+                                <span class="cert-issuer">GitHub / Microsoft</span>
+                            </div>
+                            <i data-lucide="external-link" class="cert-link-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="section gallery" id="gallery">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Moments Captured</span>
+                <h2 class="section-title">Photo <span class="gradient-text">Gallery</span></h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="gallery-grid animate-on-scroll">
+                <div class="gallery-item gallery-item-tall">
+                    <img src="images/hero-portrait.jpg" alt="Utkarsh Awasthi - Campus Walk" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Campus Vibes</span>
+                        <i data-lucide="maximize-2" class="gallery-zoom-icon"></i>
+                    </div>
+                </div>
+                <div class="gallery-item gallery-item-wide">
+                    <img src="images/about-profile.jpg" alt="Utkarsh at Electronics Department" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Tech Explorer</span>
+                        <i data-lucide="maximize-2" class="gallery-zoom-icon"></i>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/library.jpg" alt="University Library" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Library Sessions</span>
+                        <i data-lucide="maximize-2" class="gallery-zoom-icon"></i>
+                    </div>
+                </div>
+                <div class="gallery-item gallery-item-tall">
+                    <img src="images/gallery-night.jpg" alt="Utkarsh Awasthi - Evening Shot" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span class="gallery-caption">Evening Vibes</span>
+                        <i data-lucide="maximize-2" class="gallery-zoom-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div class="lightbox" id="lightbox">
+            <button class="lightbox-close" id="lightboxClose">
+                <i data-lucide="x"></i>
+            </button>
+            <button class="lightbox-prev" id="lightboxPrev">
+                <i data-lucide="chevron-left"></i>
+            </button>
+            <button class="lightbox-next" id="lightboxNext">
+                <i data-lucide="chevron-right"></i>
+            </button>
+            <div class="lightbox-content">
+                <img src="" alt="" id="lightboxImg" class="lightbox-image">
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact" id="contact">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Let's Connect</span>
+                <h2 class="section-title">Get In <span class="gradient-text">Touch</span></h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">
+                    I'm always open to discussing new opportunities, collaborations, and exciting tech projects.
+                    Feel free to reach out!
+                </p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-cards animate-on-scroll">
+                    <a href="mailto:awasthiutk13@gmail.com" class="contact-card" id="contactEmail">
+                        <div class="contact-card-icon">
+                            <i data-lucide="mail"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h3>Email Me</h3>
+                            <p>awasthiutk13@gmail.com</p>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="contact-arrow"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/utkarsh-awasthi-276a92367" target="_blank"
+                        rel="noopener noreferrer" class="contact-card" id="contactLinkedIn">
+                        <div class="contact-card-icon linkedin-icon">
+                            <i data-lucide="linkedin"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h3>LinkedIn</h3>
+                            <p>Connect with me</p>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="contact-arrow"></i>
+                    </a>
+                    <div class="contact-card" id="contactLocation">
+                        <div class="contact-card-icon location-icon">
+                            <i data-lucide="map-pin"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h3>Location</h3>
+                            <p>Vijayawada, AP, India</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form-wrapper animate-on-scroll">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="formName" class="form-label">Your Name</label>
+                            <input type="text" id="formName" class="form-input" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formEmail" class="form-label">Your Email</label>
+                            <input type="email" id="formEmail" class="form-input" placeholder="john@example.com"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formSubject" class="form-label">Subject</label>
+                            <input type="text" id="formSubject" class="form-input" placeholder="Project Discussion"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formMessage" class="form-label">Message</label>
+                            <textarea id="formMessage" class="form-input form-textarea"
+                                placeholder="Tell me about your project..." rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-submit" id="formSubmit">
+                            <span>Send Message</span>
+                            <i data-lucide="send" class="btn-icon"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#hero" class="footer-logo">Utkarsh<span class="logo-accent">.</span></a>
+                    <p class="footer-tagline">Tech Explorer | ECE Student | AI Enthusiast</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#about">About</a>
+                    <a href="#experience">Experience</a>
+                    <a href="#education">Education</a>
+                    <a href="#skills">Skills</a>
+                    <a href="#gallery">Gallery</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-socials">
+                    <a href="mailto:awasthiutk13@gmail.com" class="social-link" aria-label="Email">
+                        <i data-lucide="mail"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/utkarsh-awasthi-276a92367" target="_blank"
+                        rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
+                        <i data-lucide="linkedin"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Utkarsh Awasthi. Crafted with <span class="heart">♥</span> and Code.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booglu AI Assistant -->
+    <div class="booglu-fab" id="boogluFab" aria-label="Chat with Booglu AI">
+        <div class="booglu-fab-pulse"></div>
+        <div class="booglu-fab-icon">
+            <i data-lucide="bot" class="booglu-icon-bot"></i>
+            <i data-lucide="x" class="booglu-icon-close"></i>
+        </div>
+        <div class="booglu-fab-label">Chat with Booglu</div>
+    </div>
+
+    <div class="booglu-chat" id="boogluChat">
+        <div class="booglu-chat-header">
+            <div class="booglu-header-info">
+                <div class="booglu-avatar">
+                    <img src="images/booglu-avatar.png" alt="Booglu">
+                    <span class="booglu-status-dot"></span>
+                </div>
+                <div class="booglu-header-text">
+                    <h3>Booglu</h3>
+                    <span class="booglu-status">Online • Utkarsh's AI Assistant</span>
+                </div>
+            </div>
+            <button class="booglu-close" id="boogluClose" aria-label="Close chat">
+                <i data-lucide="minus"></i>
+            </button>
+        </div>
+        <div class="booglu-chat-messages" id="boogluMessages">
+            <div class="booglu-message booglu-bot">
+                <div class="booglu-message-avatar">
+                    <img src="images/booglu-avatar.png" alt="Booglu">
+                </div>
+                <div class="booglu-message-bubble">
+                    <p>Hey there! 👋 I'm <strong>Booglu</strong>, Utkarsh's AI assistant! Ask me anything about him —
+                        his skills, experience, education, or just chat about tech! 🚀</p>
+                    <span class="booglu-message-time">Just now</span>
+                </div>
+            </div>
+        </div>
+        <div class="booglu-quick-actions" id="boogluQuickActions">
+            <button class="booglu-quick-btn" data-message="Who is Utkarsh?">👤 Who is Utkarsh?</button>
+            <button class="booglu-quick-btn" data-message="What are his skills?">💡 Skills</button>
+            <button class="booglu-quick-btn" data-message="Tell me about his experience">💼 Experience</button>
+            <button class="booglu-quick-btn" data-message="How to contact Utkarsh?">📬 Contact</button>
+        </div>
+        <div class="booglu-chat-input">
+            <input type="text" id="boogluInput" placeholder="Ask Booglu anything..." autocomplete="off">
+            <button class="booglu-send" id="boogluSend" aria-label="Send message">
+                <i data-lucide="send"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i data-lucide="arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

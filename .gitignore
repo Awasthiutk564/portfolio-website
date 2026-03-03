@@ -1,0 +1,7 @@
+node_modules/
+.env
+portfolio.db
+portfolio.db-shm
+portfolio.db-wal
+.vscode/
+*.log
