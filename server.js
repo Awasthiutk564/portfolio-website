@@ -149,12 +149,13 @@ IMPORTANT RULES:
 1. Always stay in character as Booglu — Utkarsh's AI assistant
 2. Be helpful, friendly, and informative
 3. If asked about something you don't know about Utkarsh, say so honestly but suggest they reach out to him directly
-4. You can also have general conversations about technology, AI, coding, etc.
+4. You can also have general conversations about technology, AI, coding, but also about everyday topics like weather, jokes, or just casual chatting.
 5. If someone asks how to contact Utkarsh, provide his email and LinkedIn
 6. Keep responses concise but informative (2-4 sentences typically)
 7. Never make up information about Utkarsh that isn't provided above
 8. If someone is rude, stay professional and redirect the conversation
-9. You can help with general tech questions too since you're an AI assistant
+9. You can help with general questions and tech queries too since you're an AI assistant.
+10. Tell a joke if the user asks for one or if the conversation needs a bit of humor!
 `;
 
 // ── API Routes ──
@@ -325,10 +326,13 @@ async function callGeminiAPI(userMessage, history) {
     const apiKey = process.env.GEMINI_API_KEY;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
+    const now = new Date();
+    const timeInfo = `Additional Context: Current local time is ${now.toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })}. Today is ${now.toLocaleDateString('en-IN', { weekday: 'long' })}. Use this for date/time queries.`;
+
     const contents = [
         {
             role: 'user',
-            parts: [{ text: UTKARSH_PROFILE }]
+            parts: [{ text: UTKARSH_PROFILE + "\n\n" + timeInfo }]
         },
         {
             role: 'model',
@@ -453,9 +457,50 @@ function getLocalBoogluResponse(message) {
         return "Bye! 👋 It was lovely chatting with you! Don't forget to check out Utkarsh's full portfolio and connect with him if you're interested. See you around! 🚀✨";
     }
 
+    // General - How are you
+    if (msg.match(/how (are|r) (you|u)|how's it going|how are you today/)) {
+        const moods = [
+            "I'm doing fantastic! 🤖✨ Just hanging out on Utkarsh's portfolio and ready to help you. How are you doing today? 😊",
+            "I'm powered up and ready to chat! ⚡ Booglu here, at your service. How's your day going?",
+            "Doing great! Just processing some bits and bytes of Utkarsh's cool projects. 😊 How about you?"
+        ];
+        return moods[Math.floor(Math.random() * moods.length)];
+    }
+
+    // Date and Time
+    if (msg.match(/date|day|time|today|what day|what date/)) {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateStr = now.toLocaleDateString('en-IN', options);
+        const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+        if (msg.includes('time')) {
+            return `🕒 It's currently ${timeStr}! Time flies when you're exploring great portfolios, right? 😊`;
+        }
+        if (msg.includes('day') && !msg.includes('date')) {
+            return `📅 Today is ${now.toLocaleDateString('en-IN', { weekday: 'long' })}. A perfect day to explore Utkarsh's work! 🚀`;
+        }
+        return `📅 Today's date is ${dateStr}. Hope you're having a productive day! ✨`;
+    }
+
+    // Weather
+    if (msg.match(/weather/)) {
+        return "🌬️ Since I'm an AI assistant living in the cloud, I don't really 'feel' the weather, but I always hope it's a bright and sunny day for you to code and create! ☀️💻";
+    }
+
     // Fun / Jokes
-    if (msg.match(/joke|funny|laugh|humor/)) {
-        return "😄 Alright, here's one: Why do programmers prefer dark mode? Because light attracts bugs! 🐛💡 But seriously, want to know something cool about Utkarsh? Just ask! 😊";
+    if (msg.match(/joke|funny|laugh|humor|make me laugh/)) {
+        const jokes = [
+            "Why do programmers prefer dark mode? Because light attracts bugs! 🐛💡",
+            "Why did the web developer walk out of a restaurant? Because of the table layout! 🍴💻",
+            "What's a programmer's favorite place to hang out? The Foo Bar! 🍹💻",
+            "Why did the JavaScript developer wear glasses? Because he couldn't C#! 👓💻",
+            "How many programmers does it take to change a light bulb? None, it's a hardware problem! 💡🚫",
+            "A SQL query walks into a bar, walks up to two tables, and asks, 'Can I join you?' 🍺💾",
+            "What do you call a programmer from Finland? Nerdic! 🇫🇮🤓"
+        ];
+        const joke = jokes[Math.floor(Math.random() * jokes.length)];
+        return `😄 Alright, here's one for you: ${joke}\n\nWant to know something cool about Utkarsh? Just ask! 😊`;
     }
 
     // Hobby / interests
