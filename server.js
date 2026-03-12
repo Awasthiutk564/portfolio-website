@@ -7,7 +7,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const Database = require('better-sqlite3');
 const nodemailer = require('nodemailer');
 
 const app = express();
@@ -20,13 +19,14 @@ app.use(express.static(path.join(__dirname)));
 
 // Request Logger
 app.use((req, res, next) => {
-    console.log(`📡 [${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
+    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
     next();
 });
 
 // ── Database Setup ──
 let db;
 try {
+    const Database = require('better-sqlite3');
     // Vercel's filesystem is read-only. We must use /tmp for the database in production.
     const dbPath = process.env.NODE_ENV === 'production'
         ? path.join('/tmp', 'portfolio.db')
@@ -61,10 +61,9 @@ try {
         )
     `);
 
-    console.log('✅ Database initialized successfully at:', dbPath);
+    console.log('Database initialized successfully at:', dbPath);
 } catch (dbErr) {
-    console.error('❌ Database failed to initialize:', dbErr.message);
-    console.log('⚠️ Running in "No-DB" mode. Messages will be emailed but not saved.');
+    console.log('Running without database - using in-memory storage');
     // Mock the db object so the app doesn't crash on later calls
     db = {
         prepare: () => ({
@@ -394,7 +393,7 @@ function getLocalBoogluResponse(message) {
 
     // Who is Utkarsh
     if (msg.match(/who is utkarsh|tell me about utkarsh|about utkarsh|who.*utkarsh/)) {
-        return "Utkarsh Awasthi is a passionate 2nd year B.Tech ECE student at SRM University, AP! 🎓 He's deeply into AI, IoT, Embedded Systems, and Full Stack Development. He's currently leading Internal Affairs at HackShastra SRMAP and holds an Oracle AI certification. A true tech explorer! 🚀";
+        return "Utkarsh Awasthi is a passionate 2nd year B.Tech ECE student at SRM University, AP! 🎓 He's deeply into AI, IoT, Embedded Systems, and Full Stack Development. He's currently leading Internal Affairs at HackShastra SRMAP and holds an Oracle AI certification. A true tech explorer! ����";
     }
 
     // Education
