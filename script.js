@@ -14,87 +14,36 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('load', () => {
         setTimeout(() => {
             loader.classList.add('hidden');
-        }, 2200);
+        }, 1800);
     });
 
-    // Fallback: hide loader after 3.5s even if load event doesn't fire
+    // Fallback: hide loader after 2.5s even if load event doesn't fire
     setTimeout(() => {
         loader.classList.add('hidden');
-    }, 3500);
+    }, 2500);
 
-    // ── Custom Cursor ──
-    const cursorDot = document.getElementById('cursorDot');
-    const cursorOutline = document.getElementById('cursorOutline');
-
-    if (window.matchMedia('(pointer: fine)').matches && cursorDot && cursorOutline) {
-        let mouseX = 0, mouseY = 0;
-        let outlineX = 0, outlineY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            cursorDot.style.left = mouseX + 'px';
-            cursorDot.style.top = mouseY + 'px';
-        });
-
-        function animateCursor() {
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            cursorOutline.style.left = outlineX + 'px';
-            cursorOutline.style.top = outlineY + 'px';
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
-
-        // Hover effects for interactive elements
-        const hoverElements = document.querySelectorAll('a, button, .gallery-item, .cert-card, .info-card, .contact-card, .edu-card, .timeline-card');
-        hoverElements.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorDot.classList.add('hovering');
-                cursorOutline.classList.add('hovering');
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorDot.classList.remove('hovering');
-                cursorOutline.classList.remove('hovering');
-            });
-        });
-    }
-
-    // ── Hero Particles ──
-    const particlesContainer = document.getElementById('heroParticles');
-    if (particlesContainer) {
-        for (let i = 0; i < 40; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            const duration = Math.random() * 15 + 10;
-            const delay = Math.random() * 10;
-            particle.style.setProperty('--duration', duration + 's');
-            particle.style.setProperty('--delay', delay + 's');
-            particle.style.width = (Math.random() * 3 + 1) + 'px';
-            particle.style.height = particle.style.width;
-            const colors = ['#00d4aa', '#6c5ce7', '#4fc3f7', '#f0a500', '#f472b6'];
-            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-            particlesContainer.appendChild(particle);
-        }
-    }
+    // ── Spotlight Effect (follows cursor) ──
+    document.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth) * 100;
+        const y = ((e.clientY + window.scrollY) / document.body.scrollHeight) * 100;
+        document.body.style.setProperty('--mouse-x', x + '%');
+        document.body.style.setProperty('--mouse-y', Math.min(y, 100) + '%');
+    });
 
     // ── Typing Animation ──
     const typingElement = document.getElementById('typingText');
     if (typingElement) {
         const phrases = [
-            'Tech Explorer',
-            'ECE Student @ SRM AP',
-            'AI & ML Enthusiast',
-            'IoT Developer',
-            'Oracle Certified',
-            'Full Stack Learner'
+            'Tech Explorer.',
+            'ECE Student @ SRM AP.',
+            'AI & ML Enthusiast.',
+            'IoT Developer.',
+            'Full Stack Learner.'
         ];
         let phraseIndex = 0;
         let charIndex = 0;
         let isDeleting = false;
-        let typingSpeed = 80;
+        let typingSpeed = 60;
 
         function typeText() {
             const currentPhrase = phrases[phraseIndex];
@@ -102,26 +51,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDeleting) {
                 typingElement.textContent = currentPhrase.substring(0, charIndex - 1);
                 charIndex--;
-                typingSpeed = 40;
+                typingSpeed = 30;
             } else {
                 typingElement.textContent = currentPhrase.substring(0, charIndex + 1);
                 charIndex++;
-                typingSpeed = 80;
+                typingSpeed = 60;
             }
 
             if (!isDeleting && charIndex === currentPhrase.length) {
                 isDeleting = true;
-                typingSpeed = 2000; // Pause before deleting
+                typingSpeed = 2500; // Pause before deleting
             } else if (isDeleting && charIndex === 0) {
                 isDeleting = false;
                 phraseIndex = (phraseIndex + 1) % phrases.length;
-                typingSpeed = 500; // Pause before next phrase
+                typingSpeed = 400; // Pause before next phrase
             }
 
             setTimeout(typeText, typingSpeed);
         }
 
-        setTimeout(typeText, 2500); // Start after loader
+        setTimeout(typeText, 2000); // Start after loader
     }
 
     // ── Navbar ──
