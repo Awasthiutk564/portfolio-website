@@ -998,7 +998,7 @@ section {
 
 /* ── Experience Section ── */
 .experience {
-    background: var(--bg-secondary);
+    background: transparent;
 }
 
 .timeline {
@@ -1307,7 +1307,7 @@ section {
 
 /* ── Skills & Certifications ── */
 .skills {
-    background: var(--bg-secondary);
+    background: transparent;
 }
 
 .skills-certifications-grid {
@@ -1630,7 +1630,7 @@ section {
 
 /* ── Contact Section ── */
 .contact {
-    background: var(--bg-secondary);
+    background: transparent;
 }
 
 .contact-grid {
@@ -1781,7 +1781,7 @@ section {
 /* ── Footer ── */
 .footer {
     padding: 60px 0 0;
-    background: var(--bg-primary);
+    background: transparent;
     border-top: 1px solid var(--border-subtle);
 }
 
