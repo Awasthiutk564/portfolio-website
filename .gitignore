@@ -5,3 +5,4 @@ portfolio.db-shm
 portfolio.db-wal
 .vscode/
 *.log
+dist/

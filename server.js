@@ -17,7 +17,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.get('/resume.pdf', (req, res) => res.sendFile(path.join(__dirname, 'data', 'resume.pdf'), (err) => err && res.status(404).end()));
-app.use(express.static(path.join(__dirname)));
+// The React front end is built into dist/ (`npm run build`); data/ and images/
+// are served from the repo so they're always the latest synced copies.
+const DIST = path.join(__dirname, 'dist');
+app.use('/data', express.static(path.join(__dirname, 'data')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(express.static(DIST));
 
 // Request Logger
 app.use((req, res, next) => {
@@ -76,13 +81,19 @@ try {
 }
 
 // ── Email Transporter (Gmail SMTP) ──
+// EMAIL_PASS must be a Gmail *App Password* (Google Account → Security →
+// 2-Step Verification → App passwords), not your normal password. Google shows
+// it as "abcd efgh ijkl mnop"; the spaces are stripped here.
+const EMAIL_USER = (process.env.EMAIL_USER || '').trim();
+const EMAIL_PASS = (process.env.EMAIL_PASS || '').replace(/\s+/g, '');
+const emailConfigured = Boolean(EMAIL_USER && EMAIL_PASS);
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
+    auth: { user: EMAIL_USER, pass: EMAIL_PASS }
 });
+if (!emailConfigured) {
+    console.warn('⚠️ EMAIL_USER / EMAIL_PASS are not set: contact-form emails cannot be delivered.');
+}
 
 // ── Booglu's knowledge: built from data/profile.json ──
 // The sync pipeline (scripts/, .github/workflows/sync-portfolio.yml) rebuilds
@@ -157,7 +168,12 @@ IMPORTANT RULES:
 // POST /api/contact — Save message to DB and send email
 app.post('/api/contact', async (req, res) => {
     try {
-        const { name, email, subject, message } = req.body;
+        const { name, email, subject, message, company } = req.body;
+
+        // honeypot field: real visitors never see it, so anything in it is a bot
+        if (company) {
+            return res.json({ success: true, message: 'Message received successfully!' });
+        }
 
         // Validate input
         if (!name || !email || !subject || !message) {
@@ -188,10 +204,17 @@ app.post('/api/contact', async (req, res) => {
         // Send email notification to Utkarsh (escape user input before it goes into HTML)
         const h = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const [hName, hEmail, hSubject, hMessage] = [name, email, subject, message].map(h);
+        if (!emailConfigured) {
+            return res.status(503).json({
+                success: false,
+                error: "The contact form isn't connected to my inbox yet"
+            });
+        }
+
         let emailSent = false;
         try {
             const mailOptions = {
-                from: `"Portfolio Contact Form" <${process.env.EMAIL_USER}>`,
+                from: `"Portfolio Contact Form" <${EMAIL_USER}>`,
                 to: process.env.CONTACT_TO || PROFILE.basics.email,
                 replyTo: email,
                 subject: `🌐 Portfolio Contact: ${String(subject).slice(0, 150)}`,
@@ -231,7 +254,16 @@ app.post('/api/contact', async (req, res) => {
             emailSent = true;
             console.log(`📧 Email notification sent to Utkarsh`);
         } catch (emailErr) {
-            console.error('⚠️ Email failed to send (message still saved to DB):', emailErr.message);
+            console.error('⚠️ Email failed to send (message still saved to DB):', emailErr.code || '', emailErr.message);
+        }
+
+        // Don't tell the visitor it worked when the email never left: on Vercel
+        // the database lives in /tmp and is wiped, so the email is the only copy.
+        if (!emailSent) {
+            return res.status(502).json({
+                success: false,
+                error: "Couldn't deliver your message right now"
+            });
         }
 
         res.json({
@@ -248,6 +280,22 @@ app.post('/api/contact', async (req, res) => {
             error: 'Something went wrong. Please try again.'
         });
     }
+});
+
+// GET /api/health — is the contact form able to reach the inbox? (no secrets returned)
+app.get('/api/health', async (req, res) => {
+    let smtp = 'not configured';
+    if (emailConfigured) {
+        try {
+            await transporter.verify();
+            smtp = 'ok';
+        } catch (err) {
+            smtp = err.code === 'EAUTH'
+                ? 'login rejected: EMAIL_PASS must be a Gmail App Password'
+                : `unreachable (${err.code || 'error'})`;
+        }
+    }
+    res.json({ success: true, email: { configured: emailConfigured, smtp } });
 });
 
 // GET /api/messages — Get all messages (admin endpoint)
@@ -452,7 +500,7 @@ app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
         return next();
     }
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(DIST, 'index.html'), (err) => err && res.status(404).send('Front end not built yet. Run `npm run build`, or use `npm run dev`.'));
 });
 
 // ── Start Server ──

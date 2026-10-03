@@ -1,0 +1,56 @@
+name: Share LinkedIn post
+
+# LinkedIn has no API for reading your own posts, so this is the one manual
+# step: after posting on LinkedIn, run this from the Actions tab (works from
+# the GitHub mobile app too) with the post's link and a line of text. It
+# updates content/latest.json and commits; Vercel redeploys on the commit.
+
+"on":
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Link to the LinkedIn post (… → Copy link to post)"
+        required: true
+      text:
+        description: "One or two lines to show on the site"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  share:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write content/latest.json
+        env:
+          POST_URL: ${{ inputs.url }}
+          POST_TEXT: ${{ inputs.text }}
+        run: |
+          python3 - <<'PY'
+          import json, os, datetime, sys
+          url = os.environ["POST_URL"].strip()
+          if not url.startswith("https://www.linkedin.com/") and not url.startswith("https://lnkd.in/"):
+              sys.exit("::error::That doesn't look like a LinkedIn link")
+          path = "content/latest.json"
+          data = json.load(open(path, encoding="utf-8"))
+          data["linkedin"] = {
+              "url": url,
+              "text": os.environ["POST_TEXT"].strip()[:400],
+              "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+          }
+          with open(path, "w", encoding="utf-8") as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+              f.write("\n")
+          PY
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/latest.json
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "chore: share latest LinkedIn post"
+          git push

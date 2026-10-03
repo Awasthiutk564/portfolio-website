@@ -2,10 +2,7 @@
     "version": 2,
     "builds": [
         { "src": "server.js", "use": "@vercel/node" },
-        { "src": "index.html", "use": "@vercel/static" },
-        { "src": "assets/**", "use": "@vercel/static" },
-        { "src": "images/**", "use": "@vercel/static" },
-        { "src": "data/**", "use": "@vercel/static" }
+        { "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
     ],
     "routes": [
         { "src": "/api/(.*)", "dest": "/server.js" },
@@ -14,7 +11,11 @@
             "headers": { "cache-control": "public, max-age=0, must-revalidate" },
             "dest": "/data/$1"
         },
-        { "src": "/assets/(.*)", "dest": "/assets/$1" },
+        {
+            "src": "/assets/(.*)",
+            "headers": { "cache-control": "public, max-age=31536000, immutable" },
+            "dest": "/assets/$1"
+        },
         { "src": "/images/(.*)", "dest": "/images/$1" },
         { "src": "/resume.pdf", "dest": "/data/resume.pdf" },
         { "src": "/", "dest": "/index.html" },

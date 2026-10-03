@@ -1,0 +1,8 @@
+{
+  "_comment": "Latest LinkedIn post shown on the site. Update it with the 'Share LinkedIn post' GitHub Action (Actions tab -> Run workflow) or by editing this file. Vercel redeploys on the commit.",
+  "linkedin": {
+    "url": null,
+    "text": null,
+    "date": null
+  }
+}
