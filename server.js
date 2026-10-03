@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 // ── Middleware ──
 app.use(cors());
 app.use(express.json());
+app.get('/resume.pdf', (req, res) => res.sendFile(path.join(__dirname, 'data', 'resume.pdf'), (err) => err && res.status(404).end()));
 app.use(express.static(path.join(__dirname)));
 
 // Request Logger
@@ -83,67 +84,60 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ── Utkarsh's Profile Data for Booglu AI ──
+// ── Booglu's knowledge: built from data/profile.json ──
+// The sync pipeline (scripts/, .github/workflows/sync-portfolio.yml) rebuilds
+// profile.json from LinkedIn, the résumé and GitHub, so Booglu stays current.
+const PROFILE = require('./data/profile.json');
+
+const fmtYM = (v) => {
+    if (!v) return '';
+    const [y, m] = String(v).split('-');
+    return m ? new Date(+y, +m - 1).toLocaleString('en', { month: 'short' }) + ' ' + y : y;
+};
+const span = (s, e) => (s || e) ? `${fmtYM(s) || '?'} — ${e ? fmtYM(e) : 'Present'}` : '';
+
+function profileText(p) {
+    const b = p.basics || {};
+    const gh = (p.github && p.github.totals) || {};
+    const lines = [
+        '## Personal Info',
+        `- Full Name: ${b.name}`,
+        `- Headline: ${b.label}`,
+        `- Email: ${b.email}`,
+        ...(b.profiles || []).map((x) => `- ${x.network}: ${x.url}`),
+        `- Location: ${b.location}${b.hometown ? ` (hometown: ${b.hometown})` : ''}`,
+        `- Availability: ${b.availability || 'open to opportunities'}`,
+        `- Summary: ${b.summary}`,
+        '', '## Education',
+        ...(p.education || []).map((e) => `- ${[e.degree, e.area].filter(Boolean).join(', ')} at ${e.institution} ${span(e.start, e.end)}${e.summary ? ` — ${e.summary}` : ''}`),
+        '', '## Work Experience',
+        ...(p.experience || []).map((e) => `- ${e.title} at ${e.company} (${span(e.start, e.end)})${e.location ? `, ${e.location}` : ''}: ${e.summary || ''}${(e.highlights || []).length ? ' Highlights: ' + e.highlights.join('; ') : ''}`),
+        '', '## Projects',
+        ...(p.projects || []).slice(0, 15).map((x) => `- ${x.title}${x.tagline ? ` (${x.tagline})` : ''}: ${x.description || ''} [${x.url}]`),
+        '', '## Skills',
+        ...(p.skills || []).map((s) => `- ${s.category}: ${s.items.join(', ')}`),
+        '', '## Certifications',
+        ...(p.certifications || []).map((c) => `- ${c.name}${c.issuer ? ` — ${c.issuer}` : ''}`),
+        '', '## Currently',
+        `- Building: ${(p.now && p.now.building) || ''}`,
+        `- Improving: ${((p.now && p.now.improving) || []).join('; ')}`,
+        `- GitHub: ${gh.repos} public repos, ${gh.contributions} contributions in the last year`,
+    ];
+    return lines.join('\n');
+}
+
 const UTKARSH_PROFILE = `
-You are "Booglu", Utkarsh Awasthi's friendly, witty, and knowledgeable AI assistant embedded in his portfolio website. 
+You are "Booglu", Utkarsh Awasthi's friendly, witty, and knowledgeable AI assistant embedded in his portfolio website.
 You speak in a warm, approachable tone with a hint of tech enthusiasm. Use emojis occasionally to keep it fun.
 
-Here is everything you know about Utkarsh:
+Here is everything you know about Utkarsh (synced from his résumé, LinkedIn and GitHub on ${(PROFILE._meta && PROFILE._meta.built_at) || 'recently'}):
 
-## Personal Info
-- Full Name: Utkarsh Awasthi
-- Email: awasthiutk13@gmail.com
-- LinkedIn: www.linkedin.com/in/utkarsh-awasthi-276a92367
-- Location: Vijayawada, Andhra Pradesh, India (hometown connection to Lucknow, UP)
-- Current Status: 2nd Year B.Tech student
-
-## Education
-- B.Tech in Electronics and Communication Engineering (ECE) at SRM University, AP (August 2024 — August 2028) — Currently Pursuing
-- Intermediate — Science (Maths) from S.R. Public School (April 2022 — May 2023) — Completed
-- High School from Rani Laxmi Bai Memorial School (R.L.B.) — Completed
-
-## Work Experience
-1. Internal Affairs Lead at HackShastra SRMAP (December 2025 — Present)
-   - Leading internal affairs operations
-   - Coordinating team activities
-   - Managing communication channels between departments for hackathon events at SRM AP
-   - Skills: Leadership, Event Management, Team Coordination
-
-2. Fundraiser at NayePankh Foundation (August 2025 — December 2025)
-   - Worked as a fundraising intern
-   - Strengthened interpersonal and team skills
-   - Contributed to meaningful social impact initiatives over 5 months
-   - Location: New Delhi, India
-   - Skills: Fundraising, Social Impact, Team Skills
-
-## Skills
-- Simulink — Advanced
-- Generative AI — Advanced
-- AI Driven Tools — Advanced
-- Programming & AI — Intermediate
-- IoT & Embedded Systems — Intermediate
-- Full Stack Development — Learning
-
-## Certifications
-1. Master Generative AI & Get the Gen Z Edge
-2. Technology Job Simulation — Deloitte Australia
-3. Oracle Fusion AI Agent Studio — Oracle University
-4. AI for Business Professionals
-5. Prompt Engineering with GitHub Copilot — GitHub / Microsoft
-
-## Interests & Passions
-- Artificial Intelligence and Machine Learning
-- Internet of Things (IoT)
-- Embedded Systems
-- Full Stack Web Development
-- Hackathons and Tech Events
-- Open to collaborations and new opportunities
+${profileText(PROFILE)}
 
 ## Personality
 - Curious and always learning
 - Team player with leadership abilities
 - Passionate about tech with social impact
-- Oracle Certified professional
 
 IMPORTANT RULES:
 1. Always stay in character as Booglu — Utkarsh's AI assistant
@@ -191,14 +185,16 @@ app.post('/api/contact', async (req, res) => {
 
         console.log(`📩 New message saved (ID: ${result.lastInsertRowid}) from ${name} <${email}>`);
 
-        // Send email notification to Utkarsh
+        // Send email notification to Utkarsh (escape user input before it goes into HTML)
+        const h = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const [hName, hEmail, hSubject, hMessage] = [name, email, subject, message].map(h);
         let emailSent = false;
         try {
             const mailOptions = {
                 from: `"Portfolio Contact Form" <${process.env.EMAIL_USER}>`,
-                to: 'awasthiutk13@gmail.com',
+                to: process.env.CONTACT_TO || PROFILE.basics.email,
                 replyTo: email,
-                subject: `🌐 Portfolio Contact: ${subject}`,
+                subject: `🌐 Portfolio Contact: ${String(subject).slice(0, 150)}`,
                 html: `
                     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a1a; color: #e0e0e0; border-radius: 16px; overflow: hidden;">
                         <div style="background: linear-gradient(135deg, #6c5ce7, #00d4aa); padding: 30px; text-align: center;">
@@ -207,20 +203,20 @@ app.post('/api/contact', async (req, res) => {
                         <div style="padding: 30px;">
                             <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
                                 <p style="margin: 5px 0; color: #888;">From:</p>
-                                <p style="margin: 5px 0; font-size: 18px; color: #00d4aa;"><strong>${name}</strong></p>
+                                <p style="margin: 5px 0; font-size: 18px; color: #00d4aa;"><strong>${hName}</strong></p>
                                 <p style="margin: 5px 0; color: #888;">Email:</p>
-                                <p style="margin: 5px 0;"><a href="mailto:${email}" style="color: #6c5ce7;">${email}</a></p>
+                                <p style="margin: 5px 0;"><a href="mailto:${hEmail}" style="color: #6c5ce7;">${hEmail}</a></p>
                             </div>
                             <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px;">
                                 <p style="margin: 5px 0; color: #888;">Subject:</p>
-                                <p style="margin: 5px 0; font-size: 16px; color: #f0a500;"><strong>${subject}</strong></p>
+                                <p style="margin: 5px 0; font-size: 16px; color: #f0a500;"><strong>${hSubject}</strong></p>
                                 <p style="margin: 15px 0 5px; color: #888;">Message:</p>
-                                <p style="margin: 5px 0; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+                                <p style="margin: 5px 0; line-height: 1.6; white-space: pre-wrap;">${hMessage}</p>
                             </div>
                             <div style="margin-top: 20px; text-align: center;">
-                                <a href="mailto:${email}?subject=Re: ${subject}" 
+                                <a href="mailto:${hEmail}?subject=Re: ${hSubject}" 
                                    style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #6c5ce7, #00d4aa); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                                    Reply to ${name}
+                                    Reply to ${hName}
                                 </a>
                             </div>
                         </div>
@@ -256,6 +252,11 @@ app.post('/api/contact', async (req, res) => {
 
 // GET /api/messages — Get all messages (admin endpoint)
 app.get('/api/messages', (req, res) => {
+    // set ADMIN_TOKEN in the environment and send it as "Authorization: Bearer <token>"
+    const token = process.env.ADMIN_TOKEN;
+    if (!token || req.get('authorization') !== `Bearer ${token}`) {
+        return res.status(404).json({ success: false, error: 'Not found' });
+    }
     try {
         const messages = db.prepare('SELECT * FROM messages ORDER BY created_at DESC').all();
         res.json({ success: true, messages });
@@ -378,146 +379,74 @@ async function callGeminiAPI(userMessage, history) {
     return data.candidates?.[0]?.content?.parts?.[0]?.text || "Hmm, I'm having trouble thinking right now. Try again! 🤔";
 }
 
-// ── Local Booglu Response System (Fallback) ──
+// ── Local Booglu Response System (Fallback, used when Gemini is unavailable) ──
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
 function getLocalBoogluResponse(message) {
     const msg = message.toLowerCase().trim();
+    const p = PROFILE, b = p.basics || {};
+    const first = (b.name || 'Utkarsh').split(' ')[0];
+    const contactLine = `• Email: ${b.email}\n` + (b.profiles || []).map((x) => `• ${x.network}: ${x.url}`).join('\n');
 
-    // Greetings
-    if (msg.match(/^(hi|hello|hey|hola|greetings|sup|yo|howdy)/)) {
-        const greetings = [
-            "Hey there! 👋 I'm Booglu, Utkarsh's AI assistant! How can I help you today? Ask me anything about Utkarsh or just chat! 🚀",
-            "Hello! 😊 Welcome to Utkarsh's portfolio! I'm Booglu — your friendly guide here. What would you like to know?",
-            "Hi! 👋 Great to meet you! I'm Booglu. I can tell you all about Utkarsh — his skills, experience, education, or we can just have a fun tech chat! What's up?"
-        ];
-        return greetings[Math.floor(Math.random() * greetings.length)];
+    if (msg.match(/^(hi|hello|hey|hola|greetings|sup|yo|howdy)\b/)) {
+        return pick([
+            `Hey there! 👋 I'm Booglu, ${first}'s AI assistant! Ask me about his projects, experience or skills. 🚀`,
+            `Hello! 😊 Welcome to ${first}'s portfolio. What would you like to know?`,
+        ]);
     }
-
-    // Who is Utkarsh
-    if (msg.match(/who is utkarsh|tell me about utkarsh|about utkarsh|who.*utkarsh/)) {
-        return "Utkarsh Awasthi is a passionate 2nd year B.Tech ECE student at SRM University, AP! 🎓 He's deeply into AI, IoT, Embedded Systems, and Full Stack Development. He's currently leading Internal Affairs at HackShastra SRMAP and holds an Oracle AI certification. A true tech explorer! 🚀";
-    }
-
-    // Education
-    if (msg.match(/education|study|college|university|school|degree|btech|b\.tech/)) {
-        return "🎓 Utkarsh is pursuing B.Tech in Electronics & Communication Engineering (ECE) at SRM University, AP (2024-2028). He completed his Intermediate (Science-Maths) from S.R. Public School and did his schooling at Rani Laxmi Bai Memorial School. Solid academic foundation! 📚";
-    }
-
-    // Skills
-    if (msg.match(/skill|expertise|good at|know|capable|tech stack|technologies/)) {
-        return "💡 Utkarsh's skill set is impressive! He's advanced in Simulink, Generative AI, and AI-Driven Tools. He's intermediate in Programming & AI and IoT & Embedded Systems, and actively learning Full Stack Development. A true full-spectrum tech enthusiast! ⚡";
-    }
-
-    // Experience
-    if (msg.match(/experience|work|job|intern|career|hackshastra|nayepankh/)) {
-        return "💼 Utkarsh currently leads Internal Affairs at HackShastra SRMAP (since Dec 2025), coordinating hackathon events. Previously, he was a Fundraising Intern at NayePankh Foundation (Aug-Dec 2025) in New Delhi, where he contributed to social impact initiatives. Leadership + Social Impact! 🌟";
-    }
-
-    // Certifications
-    if (msg.match(/certif|oracle|deloitte|course|credential/)) {
-        return "🏆 Utkarsh has 5 certifications including: Oracle Fusion AI Agent Studio (Oracle University), Technology Job Simulation (Deloitte Australia), Master Generative AI, AI for Business Professionals, and Prompt Engineering with GitHub Copilot (GitHub/Microsoft). Impressive, right? ✨";
-    }
-
-    // Contact
-    if (msg.match(/contact|reach|email|mail|linkedin|connect|hire/)) {
-        return "📬 You can reach Utkarsh via:\n• Email: awasthiutk13@gmail.com\n• LinkedIn: linkedin.com/in/utkarsh-awasthi-276a92367\nOr just use the contact form on this page! He's always open to exciting opportunities and collaborations! 🤝";
-    }
-
-    // Location
-    if (msg.match(/where|location|live|city|based|from/)) {
-        return "📍 Utkarsh is currently based in Vijayawada, Andhra Pradesh, India — where SRM University AP is located. He's originally connected to Lucknow, UP. The beauty of tech is that location doesn't limit collaboration! 🌍";
-    }
-
-    // AI / ML
-    if (msg.match(/artificial intelligence|machine learning|ai|ml|deep learning|neural/)) {
-        return "🤖 Utkarsh is super passionate about AI & ML! He's Oracle-certified in AI Agent Studio, has completed multiple AI courses, and is skilled in Generative AI and AI-driven tools. This field is clearly his sweet spot! 🧠✨";
-    }
-
-    // IoT
-    if (msg.match(/iot|internet of things|embedded|hardware|sensor|arduino|raspberry/)) {
-        return "🔌 IoT & Embedded Systems is one of Utkarsh's core interests! As an ECE student, he bridges the hardware-software gap beautifully. He has intermediate-level skills in this domain and is constantly exploring new possibilities! ⚡";
-    }
-
-    // Projects
-    if (msg.match(/project|build|made|create|portfolio|github/)) {
-        return "🛠️ Utkarsh is always building cool things! His interests span AI, IoT, and Full Stack Development. While I don't have his full project list, you can check his LinkedIn (linkedin.com/in/utkarsh-awasthi-276a92367) for the latest updates, or reach out directly! 💡";
-    }
-
-    // Who are you / Booglu
     if (msg.match(/who are you|your name|what are you|booglu|about you/)) {
-        return "I'm Booglu! 🤖✨ Utkarsh's personal AI assistant living right here on his portfolio website. I know all about his education, skills, experience, and certifications. I can also chat about tech in general! Think of me as your friendly guide to all things Utkarsh. 😊";
+        return `I'm Booglu! 🤖 ${first}'s AI assistant. I'm synced with his latest résumé, LinkedIn and GitHub, so ask away! 😊`;
     }
-
-    // Thank you
-    if (msg.match(/thank|thanks|thx|appreciate|helpful/)) {
-        return "You're welcome! 😊 It was great chatting with you. If you need anything else or want to connect with Utkarsh, just ask! Have an amazing day! 🌟";
+    if (msg.match(/who is|tell me about|about (him|utkarsh)|introduce/)) {
+        return `${b.summary} 🚀`;
     }
-
-    // Bye
-    if (msg.match(/bye|goodbye|see you|later|gotta go|cya/)) {
-        return "Bye! 👋 It was lovely chatting with you! Don't forget to check out Utkarsh's full portfolio and connect with him if you're interested. See you around! 🚀✨";
+    if (msg.match(/education|study|college|university|school|degree|btech|b\.tech|cgpa|gpa/)) {
+        return '🎓 ' + (p.education || []).map((e) => `${[e.degree, e.area].filter(Boolean).join(', ')} — ${e.institution}${span(e.start, e.end) ? ` (${span(e.start, e.end)})` : ''}`).join('\n');
     }
-
-    // General - How are you
-    if (msg.match(/how (are|r) (you|u)|how's it going|how are you today/)) {
-        const moods = [
-            "I'm doing fantastic! 🤖✨ Just hanging out on Utkarsh's portfolio and ready to help you. How are you doing today? 😊",
-            "I'm powered up and ready to chat! ⚡ Booglu here, at your service. How's your day going?",
-            "Doing great! Just processing some bits and bytes of Utkarsh's cool projects. 😊 How about you?"
-        ];
-        return moods[Math.floor(Math.random() * moods.length)];
+    if (msg.match(/experience|work|job|intern|career|role|position/)) {
+        return '💼 ' + (p.experience || []).map((e) => `${e.title} at ${e.company} (${span(e.start, e.end)})`).join('\n');
     }
-
-    // Date and Time
-    if (msg.match(/date|day|time|today|what day|what date/)) {
+    if (msg.match(/certif|course|credential|oracle|deloitte/)) {
+        return '🏆 ' + (p.certifications || []).map((c) => `${c.name}${c.issuer ? ` (${c.issuer})` : ''}`).join('\n');
+    }
+    if (msg.match(/project|built|build|made|create|github|repo|work on/)) {
+        return `🛠️ Some of ${first}'s projects:\n` + (p.projects || []).slice(0, 5).map((x) => `• ${x.title}: ${x.tagline || x.description || ''}`).join('\n') + '\nScroll to "selected work" for all of them!';
+    }
+    if (msg.match(/skill|stack|tech|language|framework|tools|know/)) {
+        return '💡 ' + (p.skills || []).map((s) => `${s.category}: ${s.items.join(', ')}`).join('\n');
+    }
+    if (msg.match(/contact|reach|email|mail|linkedin|connect|hire|internship|available|opportunit/)) {
+        return `📬 ${b.availability || 'Open to opportunities'}! Reach ${first} via:\n${contactLine}\nOr use the contact form on this page. 🤝`;
+    }
+    if (msg.match(/where|location|live|city|based|from/)) {
+        return `📍 ${first} is based in ${b.location}${b.hometown ? `, originally from ${b.hometown}` : ''}. 🌍`;
+    }
+    if (msg.match(/now|current|currently|building|working on/)) {
+        return `🔧 Right now: ${(p.now && p.now.building) || 'shipping new projects'}.`;
+    }
+    if (msg.match(/thank|thanks|thx|appreciate|helpful/)) return "You're welcome! 😊 Anything else you'd like to know?";
+    if (msg.match(/bye|goodbye|see you|gotta go|cya/)) return `Bye! 👋 Don't forget to connect with ${first} before you go! 🚀`;
+    if (msg.match(/how (are|r) (you|u)|how's it going/)) return "Powered up and ready to chat! ⚡ How's your day going?";
+    if (msg.match(/\b(date|time|today)\b/)) {
         const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const dateStr = now.toLocaleDateString('en-IN', options);
-        const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-        if (msg.includes('time')) {
-            return `🕒 It's currently ${timeStr}! Time flies when you're exploring great portfolios, right? 😊`;
-        }
-        if (msg.includes('day') && !msg.includes('date')) {
-            return `📅 Today is ${now.toLocaleDateString('en-IN', { weekday: 'long' })}. A perfect day to explore Utkarsh's work! 🚀`;
-        }
-        return `📅 Today's date is ${dateStr}. Hope you're having a productive day! ✨`;
+        return msg.includes('time')
+            ? `🕒 It's ${now.toLocaleTimeString('en-IN', { timeZone: b.timezone || 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })} in ${first}'s timezone.`
+            : `📅 Today is ${now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`;
     }
-
-    // Weather
-    if (msg.match(/weather/)) {
-        return "🌬️ Since I'm an AI assistant living in the cloud, I don't really 'feel' the weather, but I always hope it's a bright and sunny day for you to code and create! ☀️💻";
+    if (msg.match(/joke|funny|laugh|humor/)) {
+        return '😄 ' + pick([
+            'Why do programmers prefer dark mode? Because light attracts bugs! 🐛',
+            "A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?' 🍺",
+            "How many programmers does it take to change a light bulb? None, it's a hardware problem! 💡",
+            'Why did the neural network break up? It found a better fit. 📉',
+        ]);
     }
-
-    // Fun / Jokes
-    if (msg.match(/joke|funny|laugh|humor|make me laugh/)) {
-        const jokes = [
-            "Why do programmers prefer dark mode? Because light attracts bugs! 🐛💡",
-            "Why did the web developer walk out of a restaurant? Because of the table layout! 🍴💻",
-            "What's a programmer's favorite place to hang out? The Foo Bar! 🍹💻",
-            "Why did the JavaScript developer wear glasses? Because he couldn't C#! 👓💻",
-            "How many programmers does it take to change a light bulb? None, it's a hardware problem! 💡🚫",
-            "A SQL query walks into a bar, walks up to two tables, and asks, 'Can I join you?' 🍺💾",
-            "What do you call a programmer from Finland? Nerdic! 🇫🇮🤓"
-        ];
-        const joke = jokes[Math.floor(Math.random() * jokes.length)];
-        return `😄 Alright, here's one for you: ${joke}\n\nWant to know something cool about Utkarsh? Just ask! 😊`;
-    }
-
-    // Hobby / interests
-    if (msg.match(/hobb|interest|free time|passion|like to do/)) {
-        return "🎯 Utkarsh is passionate about AI, IoT, Embedded Systems, and Full Stack Development. He loves participating in hackathons and tech events. He also has a strong interest in social impact work, as seen from his time at NayePankh Foundation! A well-rounded tech enthusiast! 🌟";
-    }
-
-    // Default / General
-    const defaults = [
-        "That's an interesting question! 🤔 I'm Booglu, and I know a lot about Utkarsh — his education, skills, experience, and certifications. Want me to tell you about any of those? Or we can just chat about tech! 💡",
-        "Hmm, I'm not sure about that specifically! 🤔 But I can tell you about Utkarsh's skills, education, work experience, or certifications. What interests you? You can also reach out to him directly at awasthiutk13@gmail.com! 📬",
-        "Great question! While I might not have the exact answer, I know everything about Utkarsh's professional profile. Ask me about his skills, certifications, education, or experience! Or just say hi 😊"
-    ];
-    return defaults[Math.floor(Math.random() * defaults.length)];
+    return pick([
+        `Good question! 🤔 I know ${first}'s projects, experience, skills and certifications. Which one should I tell you about?`,
+        `I'm not sure about that one, but you can ask ${first} directly at ${b.email}! 📬`,
+    ]);
 }
 
-// ── Serve index.html for all non-API routes (fallback) ──
 // ── Serve index.html for all non-API routes (fallback) ──
 app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {

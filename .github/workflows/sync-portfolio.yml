@@ -1,0 +1,74 @@
+name: Sync portfolio
+
+# Rebuilds data/profile.json from every source and commits it; Vercel redeploys
+# on the commit. Runs daily (GitHub stats), whenever you push a new résumé,
+# LinkedIn CSVs or content edits, and on demand from the Actions tab.
+
+"on":
+  schedule:
+    - cron: "23 5 * * *"   # ~10:53 IST daily
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "sources/**"
+      - "content/**"
+      - "scripts/**"
+      - ".github/workflows/sync-portfolio.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-portfolio
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # the repo is public: never keep anything but the six public-profile CSVs
+      - name: Guard LinkedIn uploads
+        run: |
+          shopt -s nullglob nocaseglob
+          removed=""
+          for f in sources/linkedin/*; do
+            case "$(basename "$f")" in
+              positions.csv|education.csv|certifications.csv|skills.csv|projects.csv|honors.csv|.gitkeep) ;;
+              *) git rm -rq --cached "$f" 2>/dev/null; rm -rf "$f"; removed="$removed $(basename "$f")" ;;
+            esac
+          done
+          if [ -n "$removed" ]; then
+            echo "::warning::Removed private LinkedIn files:$removed. They are still in git history; see sources/README.md."
+          fi
+
+      - name: Import LinkedIn export
+        run: python scripts/import_linkedin.py
+
+      - name: Import résumé PDF
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/import_resume.py
+
+      - name: Sync GitHub repos and contributions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/sync_github.py
+
+      - name: Build profile.json
+        run: python scripts/build_profile.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data content sources
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -m "chore(sync): refresh portfolio data"
+          git push

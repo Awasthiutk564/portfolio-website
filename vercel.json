@@ -1,43 +1,23 @@
 {
     "version": 2,
     "builds": [
-        {
-            "src": "server.js",
-            "use": "@vercel/node"
-        },
-        {
-            "src": "images/**",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "style.css",
-            "use": "@vercel/static"
-        },
-        {
-            "src": "script.js",
-            "use": "@vercel/static"
-        }
+        { "src": "server.js", "use": "@vercel/node" },
+        { "src": "index.html", "use": "@vercel/static" },
+        { "src": "assets/**", "use": "@vercel/static" },
+        { "src": "images/**", "use": "@vercel/static" },
+        { "src": "data/**", "use": "@vercel/static" }
     ],
     "routes": [
+        { "src": "/api/(.*)", "dest": "/server.js" },
         {
-            "src": "/api/(.*)",
-            "dest": "/server.js"
+            "src": "/data/(.*)",
+            "headers": { "cache-control": "public, max-age=0, must-revalidate" },
+            "dest": "/data/$1"
         },
-        {
-            "src": "/images/(.*)",
-            "dest": "/images/$1"
-        },
-        {
-            "src": "/style.css",
-            "dest": "/style.css"
-        },
-        {
-            "src": "/script.js",
-            "dest": "/script.js"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/server.js"
-        }
+        { "src": "/assets/(.*)", "dest": "/assets/$1" },
+        { "src": "/images/(.*)", "dest": "/images/$1" },
+        { "src": "/resume.pdf", "dest": "/data/resume.pdf" },
+        { "src": "/", "dest": "/index.html" },
+        { "src": "/(.*)", "dest": "/index.html" }
     ]
 }

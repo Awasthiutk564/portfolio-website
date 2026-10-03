@@ -1,0 +1,293 @@
+{
+  "_comment": "Hand-written baseline. The sync pipeline merges LinkedIn + résumé data on top of this; see PIPELINE.md.",
+  "basics": {
+    "name": "Utkarsh Awasthi",
+    "handle": "utkarsh",
+    "label": "AI/ML Developer · Computer Vision · Edge AI",
+    "roles": [
+      "computer vision systems",
+      "TinyML on the edge",
+      "ML APIs with FastAPI",
+      "full-stack AI products"
+    ],
+    "summary": "B.Tech ECE student at SRM University AP building applied AI end to end: train the model, shape the API, wire the frontend, and ship something people can actually use. Most of my work sits where hardware meets software, from satellite image super-resolution to keyword spotting on an ESP32-S3.",
+    "location": "Vijayawada, Andhra Pradesh, India",
+    "timezone": "Asia/Kolkata",
+    "email": "awasthiutk13@gmail.com",
+    "availability": "Open to internships & collaborations",
+    "image": "images/ascii-source.png",
+    "photo": "images/about-profile.jpg",
+    "resume": "resume.pdf",
+    "profiles": [
+      {
+        "network": "GitHub",
+        "username": "Awasthiutk564",
+        "url": "https://github.com/Awasthiutk564"
+      },
+      {
+        "network": "LinkedIn",
+        "username": "utkarsh-awasthi-276a92367",
+        "url": "https://www.linkedin.com/in/utkarsh-awasthi-276a92367/"
+      }
+    ]
+  },
+  "focus": [
+    {
+      "title": "Vision",
+      "items": [
+        "Satellite image super-resolution",
+        "Deep learning experimentation",
+        "Applied AI problem solving"
+      ]
+    },
+    {
+      "title": "Systems",
+      "items": [
+        "ML APIs with FastAPI",
+        "Structured backend pipelines",
+        "End-to-end project architecture"
+      ]
+    },
+    {
+      "title": "Edge",
+      "items": [
+        "TinyML keyword spotting",
+        "IoT & embedded systems",
+        "Simulink modelling"
+      ]
+    }
+  ],
+  "now": {
+    "building": "IDP 420: an intelligent document processing system",
+    "improving": [
+      "Model quality beyond bicubic baselines",
+      "Production-style project structure",
+      "Engineering polish across ML applications"
+    ]
+  },
+  "experience": [
+    {
+      "company": "HackShastra SRMAP",
+      "title": "Internal Affairs Lead",
+      "location": "Vijayawada, Andhra Pradesh, India",
+      "start": "2025-12",
+      "end": null,
+      "summary": "Leading internal affairs operations, coordinating team activities, and managing communication between departments for hackathon events at SRM AP.",
+      "tags": [
+        "Leadership",
+        "Event Management",
+        "Team Coordination"
+      ]
+    },
+    {
+      "company": "NayePankh Foundation",
+      "title": "Fundraising Intern",
+      "location": "New Delhi, India",
+      "start": "2025-08",
+      "end": "2025-12",
+      "summary": "Fundraising internship strengthening interpersonal and team skills while contributing to social impact initiatives over five months.",
+      "tags": [
+        "Fundraising",
+        "Social Impact",
+        "Teamwork"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "SRM University, AP",
+      "degree": "Bachelor of Technology",
+      "area": "Electronics and Communication Engineering",
+      "start": "2024-08",
+      "end": "2028-08",
+      "summary": "Focus on AI, IoT, embedded systems and full-stack development."
+    },
+    {
+      "institution": "S. R. Public School",
+      "degree": "Intermediate",
+      "area": "Science (Mathematics)",
+      "start": "2022-04",
+      "end": "2023-05"
+    },
+    {
+      "institution": "Rani Laxmi Bai Memorial School",
+      "degree": "High School",
+      "area": null,
+      "start": null,
+      "end": null
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Oracle Fusion AI Agent Studio",
+      "issuer": "Oracle University"
+    },
+    {
+      "name": "Technology Job Simulation",
+      "issuer": "Deloitte Australia"
+    },
+    {
+      "name": "Prompt Engineering with GitHub Copilot",
+      "issuer": "GitHub / Microsoft"
+    },
+    {
+      "name": "AI for Business Professionals",
+      "issuer": "Professional Course"
+    },
+    {
+      "name": "Master Generative AI & Get the Gen Z Edge",
+      "issuer": "Professional Course"
+    }
+  ],
+  "skills": [
+    {
+      "category": "AI / ML",
+      "items": [
+        "PyTorch",
+        "TensorFlow",
+        "OpenCV",
+        "Generative AI",
+        "TinyML"
+      ]
+    },
+    {
+      "category": "Backend",
+      "items": [
+        "FastAPI",
+        "Django",
+        "Express",
+        "Spring"
+      ]
+    },
+    {
+      "category": "Frontend",
+      "items": [
+        "React",
+        "Tailwind CSS",
+        "Angular",
+        "TypeScript"
+      ]
+    },
+    {
+      "category": "Data & Infra",
+      "items": [
+        "Docker",
+        "PostgreSQL",
+        "MongoDB",
+        "Supabase",
+        "Firebase"
+      ]
+    },
+    {
+      "category": "Hardware",
+      "items": [
+        "ESP32-S3",
+        "Embedded C",
+        "IoT",
+        "Simulink"
+      ]
+    },
+    {
+      "category": "Languages",
+      "items": [
+        "Python",
+        "C",
+        "JavaScript",
+        "TypeScript",
+        "HTML/CSS"
+      ]
+    }
+  ],
+  "skill_icons": "python,pytorch,tensorflow,opencv,fastapi,django,express,spring,react,tailwind,angular,ts,js,c,docker,postgres,mongodb,supabase,firebase,git,linux,arduino",
+  "featured_projects": [
+    {
+      "repo": "sih-voice-kws",
+      "title": "SIH Voice KWS",
+      "tagline": "TinyML keyword spotting on an ESP32-S3",
+      "tags": [
+        "TinyML",
+        "ESP32-S3",
+        "Audio",
+        "C"
+      ]
+    },
+    {
+      "repo": "satellite-srcnn",
+      "title": "Satellite SRCNN",
+      "tagline": "Super-resolution for satellite imagery",
+      "tags": [
+        "Deep Learning",
+        "Computer Vision",
+        "Python"
+      ]
+    },
+    {
+      "repo": "IDP-420",
+      "title": "IDP 420",
+      "tagline": "Intelligent document processing",
+      "tags": [
+        "AI",
+        "Documents",
+        "Python"
+      ]
+    },
+    {
+      "repo": "TechRakshak",
+      "title": "TechRakshak",
+      "tagline": "Intelligence-based surveillance camera",
+      "tags": [
+        "Computer Vision",
+        "Python"
+      ]
+    },
+    {
+      "repo": "NWP-Forecast",
+      "title": "NWP Forecast",
+      "tagline": "Numerical weather prediction & forecasting",
+      "tags": [
+        "Weather",
+        "TypeScript"
+      ]
+    },
+    {
+      "repo": "Campus-Drop",
+      "title": "Campus Drop",
+      "tagline": "Smart delivery system on an IoT architecture",
+      "tags": [
+        "IoT",
+        "Systems"
+      ]
+    },
+    {
+      "repo": "image-processing-using-convolution",
+      "title": "Convolution Studio",
+      "tagline": "Blur, sharpen & edge detection with a GUI",
+      "tags": [
+        "Signal Processing",
+        "Python"
+      ]
+    },
+    {
+      "repo": "student-health-model",
+      "title": "Student Health Model",
+      "tagline": "Regression & classification model comparison",
+      "tags": [
+        "ML",
+        "Python"
+      ]
+    },
+    {
+      "repo": "Sudoku-DFS-Visualizer-C",
+      "title": "Sudoku DFS Visualizer",
+      "tagline": "DFS + backtracking, visualized step by step",
+      "tags": [
+        "Algorithms",
+        "C"
+      ]
+    }
+  ],
+  "projects": [],
+  "hidden_repos": [
+    "portfolio-website"
+  ]
+}
