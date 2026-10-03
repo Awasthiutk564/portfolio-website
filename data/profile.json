@@ -227,7 +227,7 @@
         "Python"
       ],
       "url": "https://github.com/Awasthiutk564/satellite-srcnn",
-      "homepage": null,
+      "homepage": "https://satellite-srcnn.vercel.app",
       "language": "Python",
       "stars": 2,
       "forks": 0,
@@ -273,13 +273,13 @@
       "title": "NWP Forecast",
       "repo": "NWP-Forecast",
       "tagline": "Numerical weather prediction & forecasting",
-      "description": "weather forecasting",
+      "description": "weather forecasting ",
       "tags": [
         "Weather",
         "TypeScript"
       ],
       "url": "https://github.com/Awasthiutk564/NWP-Forecast",
-      "homepage": null,
+      "homepage": "https://nwp-forecast.vercel.app",
       "language": "TypeScript",
       "stars": 0,
       "forks": 0,
@@ -341,7 +341,7 @@
       "title": "Sudoku DFS Visualizer",
       "repo": "Sudoku-DFS-Visualizer-C",
       "tagline": "DFS + backtracking, visualized step by step",
-      "description": "Sudoku Solver built in C using DFS + Backtracking — features live step-by-step visualization, color-coded DFS paths, batch puzzle solving from file, execution time tracking and automatic export of solved grids.",
+      "description": "Sudoku Solver built in C using DFS + Backtracking — features live step-by-step visualization, color-coded DFS paths, batch puzzle solving from file, execution time tracking and automatic export of solved grids.  #sudoku  #dfs  #cprogramming  #backtracking  #visualization  #algorithm   #dsa  #datastructures  #graphsearch  #grid  #codesolver ",
       "tags": [
         "Algorithms",
         "C"
@@ -390,7 +390,7 @@
       "title": "Signal classification demo",
       "repo": "Signal-classification-demo",
       "tagline": null,
-      "description": "Simple ML project for signal classification",
+      "description": "“Simple ML project for signal classification”",
       "tags": [
         "Python"
       ],
@@ -408,24 +408,27 @@
       "login": "Awasthiutk564",
       "url": "https://github.com/Awasthiutk564",
       "avatar": "https://avatars.githubusercontent.com/u/241704042?v=4",
-      "followers": 0,
+      "followers": 12,
       "public_repos": 18
     },
     "totals": {
       "repos": 14,
       "stars": 15,
       "forks": 5,
-      "contributions": 237,
-      "active_days": 70,
-      "current_streak": 1,
+      "contributions": 242,
+      "active_days": 71,
+      "current_streak": 2,
       "longest_streak": 23
     },
     "languages": {
-      "Python": 8,
-      "TypeScript": 2,
-      "C": 2,
-      "HTML": 1,
-      "CSS": 1
+      "C": 33496766,
+      "Python": 925434,
+      "TypeScript": 472005,
+      "HTML": 127158,
+      "CSS": 114589,
+      "JavaScript": 100077,
+      "C++": 13647,
+      "TeX": 360
     },
     "contributions": [
       {
@@ -1907,16 +1910,20 @@
       {
         "date": "2026-10-02",
         "count": 4
+      },
+      {
+        "date": "2026-10-03",
+        "count": 5
       }
     ]
   },
   "_meta": {
-    "built_at": "2026-10-03T07:09:52Z",
+    "built_at": "2026-10-03T12:07:25Z",
     "sources": {
       "manual": true,
       "linkedin": null,
       "resume": null,
-      "github": "2026-10-02T12:37:00Z"
+      "github": "2026-10-03T12:07:25Z"
     },
     "resume_pdf": false
   }
