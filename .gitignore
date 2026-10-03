@@ -6,3 +6,6 @@ portfolio.db-wal
 .vscode/
 *.log
 dist/
+
+.vercel
+.env*
