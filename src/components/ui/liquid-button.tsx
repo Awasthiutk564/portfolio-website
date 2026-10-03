@@ -52,7 +52,7 @@ function Inner({ tone = "chrome", size = "md", icon, children }: Common) {
 
 const shell = (tone: Tone, className?: string) =>
   cn(
-    "liquid-btn group relative inline-flex select-none rounded-full p-[1.5px] focus-visible:outline-2 focus-visible:outline-offset-4 disabled:pointer-events-none disabled:opacity-60",
+    "liquid-btn group relative inline-flex select-none rounded-full p-[2px] focus-visible:outline-2 focus-visible:outline-offset-4 disabled:pointer-events-none disabled:opacity-60",
     tone === "chrome" ? "liquid-glow focus-visible:outline-primary" : "liquid-glow-dark focus-visible:outline-black",
     className,
   );

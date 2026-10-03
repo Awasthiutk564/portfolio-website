@@ -503,8 +503,8 @@ app.use((req, res, next) => {
     res.sendFile(path.join(DIST, 'index.html'), (err) => err && res.status(404).send('Front end not built yet. Run `npm run build`, or use `npm run dev`.'));
 });
 
-// ── Start Server ──
-app.listen(PORT, () => {
+// ── Start Server ── (on Vercel, api/index.js exports the app as a function instead)
+if (!process.env.VERCEL) app.listen(PORT, () => {
     console.log(`
 ╔══════════════════════════════════════════════╗
 ║  🚀 Utkarsh Portfolio Server Running!        ║
@@ -522,3 +522,5 @@ process.on('SIGINT', () => {
     db.close();
     process.exit(0);
 });
+
+module.exports = app;

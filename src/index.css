@@ -88,9 +88,9 @@
 .liquid-metal {
   background:
     radial-gradient(60% 80% at 30% 30%, rgba(255, 255, 255, 0.9), transparent 60%),
-    linear-gradient(115deg, #f5f4e7 0%, #9d9c8e 14%, #ffffff 26%, #77766b 40%, #e8e7d4 52%, #b3b2a2 64%, #fdfdf6 76%, #8a8979 88%, #ecebd9 100%);
-  background-size: 100% 100%, 260% 100%;
-  filter: url(#liquid-metal);
+    linear-gradient(105deg, #fbfaf0 0%, #6d6c62 9%, #f2f1e2 17%, #ffffff 24%, #4b4a43 33%, #c9c8b6 41%, #fffff8 50%, #8b8a7c 59%, #3f3e38 66%, #e6e5d2 75%, #ffffff 83%, #77766a 92%, #f5f4e6 100%);
+  background-size: 100% 100%, 220% 100%;
+  filter: url(#liquid-metal) contrast(1.08);
   animation: liquid-flow 9s ease-in-out infinite;
 }
 .liquid-metal-dark {
@@ -100,9 +100,8 @@
   background-size: 100% 100%, 260% 100%;
 }
 .liquid-gloss {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0) 52%, rgba(255, 255, 255, 0.25) 100%);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -3px 8px rgba(0, 0, 0, 0.35);
-  mix-blend-mode: soft-light;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 42%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.06) 70%, rgba(255, 255, 255, 0.2) 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -4px 10px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 .liquid-gloss-dark {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.04) 48%, rgba(255, 255, 255, 0) 52%, rgba(255, 255, 255, 0.12) 100%);

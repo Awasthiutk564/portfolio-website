@@ -12,3 +12,24 @@
 LinkedIn offers no API to read your own profile and blocks scraping, so the export is the only legitimate route. **Never upload the full export ZIP or `Profile.csv`**: this repo is public and those contain private data.
 
 Priority when sources disagree: LinkedIn > résumé > manual.
+
+## "Fresh off the feed" (one latest post from each network)
+
+| Card | How it updates |
+| --- | --- |
+| GitHub | Live. Every visit reads your newest public activity (push, new repo, release, merged PR) from the GitHub API. Pushes to the profile README and this site are skipped. Nothing to do. |
+| LinkedIn | After you post: GitHub → **Actions → Share LinkedIn post → Run workflow**, paste the post link (… → *Copy link to post*) and a line of text. Works from the GitHub mobile app. It updates `content/latest.json` and Vercel redeploys in about a minute. |
+
+LinkedIn has no API for reading your own posts and blocks scraping, which is why that card needs this one step.
+
+## Contact form → your inbox
+
+The form emails you through Gmail. In **Vercel → Project → Settings → Environment Variables** set:
+
+| Variable | Value |
+| --- | --- |
+| `EMAIL_USER` | the Gmail address that sends the email |
+| `EMAIL_PASS` | a Gmail **App Password**, not your normal password. Turn on 2-Step Verification, then Google Account → Security → *App passwords* |
+| `CONTACT_TO` | optional: where messages go (defaults to the email in `profile.json`) |
+
+Redeploy afterwards, then open `/api/health`. `"smtp": "ok"` means the form can reach your inbox. If sending fails, visitors now see an error and a pre-filled "send it from your email app" link instead of a false "delivered".
