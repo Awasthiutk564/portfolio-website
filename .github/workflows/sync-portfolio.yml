@@ -1,12 +1,13 @@
 name: Sync portfolio
 
 # Rebuilds data/profile.json from every source and commits it; Vercel redeploys
-# on the commit. Runs daily (GitHub stats), whenever you push a new résumé,
-# LinkedIn CSVs or content edits, and on demand from the Actions tab.
+# on the commit. Runs hourly (GitHub repos, pins and stats; it only commits when
+# something changed), whenever you push a new résumé, LinkedIn CSVs or content
+# edits, and on demand from the Actions tab.
 
 "on":
   schedule:
-    - cron: "23 5 * * *"   # ~10:53 IST daily
+    - cron: "23 * * * *"   # hourly
   workflow_dispatch: {}
   push:
     branches: [main]

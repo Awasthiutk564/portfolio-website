@@ -4,7 +4,8 @@
 
 | Source | How to update | Automatic? |
 | --- | --- | --- |
-| GitHub repos & contributions | Nothing to do | Daily |
+| GitHub repos & contributions | Nothing to do. New public repos join "selected work" by themselves | Hourly |
+| Featured projects | Pin repos on your GitHub profile (up to 6): they lead "selected work" in pin order. The title, tagline and tags in `content/manual.json` → `featured_projects` still apply to any repo; with nothing pinned, that list is the featured set | Hourly |
 | Résumé | Replace `sources/resume.pdf` and push. Gemini parses it; the PDF becomes the site's download button | On push (needs `GEMINI_API_KEY` repo secret) |
 | LinkedIn | LinkedIn → Settings → Data privacy → Get a copy of your data. Upload **only** `Positions.csv`, `Education.csv`, `Certifications.csv`, `Skills.csv`, `Projects.csv`, `Honors.csv` to `sources/linkedin/` | On push |
 | Hand-written bits (tagline, featured projects, focus) | Edit `content/manual.json` | On push |

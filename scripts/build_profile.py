@@ -91,42 +91,49 @@ def main():
     if extra:
         skills.append({"category": "Also", "items": extra})
 
-    # projects: featured repos enriched with live GitHub data, then non-GitHub ones
+    # projects: featured repos enriched with live GitHub data, then non-GitHub ones.
+    # Featured = the repos pinned on your GitHub profile, in pin order; with no
+    # pins it falls back to featured_projects. Either way featured_projects
+    # supplies the hand-written title/tagline/tags for any of your repos.
+    login = (github or {}).get("user", {}).get("login", "Awasthiutk564")
     repos = {r["name"].lower(): r for r in (github or {}).get("repos", [])}
-    projects, seen = [], set()
+    notes = {f["repo"].lower(): f for f in manual.get("featured_projects", [])}
     hidden = {norm(n) for n in manual.get("hidden_repos", [])}
-    for f in manual.get("featured_projects", []):
-        r = repos.get(f["repo"].lower(), {})
-        projects.append({
-            "title": f.get("title") or f["repo"],
-            "repo": f["repo"],
+    pins = (github or {}).get("pinned") or []
+    if pins:
+        featured = [(r, notes.get(r["name"].lower(), {}) if r["owner"].lower() == login.lower() else {}) for r in pins]
+    else:
+        featured = [(repos.get(f["repo"].lower(), {}), f) for f in manual.get("featured_projects", [])]
+
+    def project(r, f, is_featured):
+        name = r.get("name") or f["repo"]
+        return {
+            "title": f.get("title") or name.replace("-", " ").replace("_", " "),
+            "repo": name,
             "tagline": f.get("tagline"),
             "description": f.get("description") or r.get("description"),
-            "tags": f.get("tags", []),
-            "url": r.get("url") or f"https://github.com/{(github or {}).get('user', {}).get('login', 'Awasthiutk564')}/{f['repo']}",
+            "tags": r.get("topics") or f.get("tags") or ([r["language"]] if r.get("language") else []),
+            "url": r.get("url") or f"https://github.com/{login}/{name}",
             "homepage": r.get("homepage"),
             "language": r.get("language"),
             "stars": r.get("stars", 0),
             "forks": r.get("forks", 0),
             "pushed_at": r.get("pushed_at"),
-            "featured": True,
-        })
-        seen.add(norm(f["repo"]))
-        seen.add(norm(f.get("title")))
+            "featured": is_featured,
+        }
+
+    projects, seen = [], set()
+    for r, f in featured:
+        projects.append(project(r, f, True))
+        seen.update({norm(projects[-1]["repo"]), norm(projects[-1]["title"])})
     # every other public, non-fork repo shows up automatically as you create it
     for r in (github or {}).get("repos", []):
         if r["fork"] or r["archived"] or norm(r["name"]) in seen or norm(r["name"]) in hidden:
             continue
-        if r["name"].lower() == (github or {}).get("user", {}).get("login", "").lower():
+        if r["name"].lower() == login.lower():
             continue  # the profile README repo
-        projects.append({
-            "title": r["name"].replace("-", " ").replace("_", " "),
-            "repo": r["name"], "tagline": None, "description": r.get("description"),
-            "tags": [r["language"]] if r.get("language") else [], "url": r["url"],
-            "homepage": r.get("homepage"), "language": r.get("language"),
-            "stars": r["stars"], "forks": r["forks"], "pushed_at": r["pushed_at"], "featured": False,
-        })
-        seen.add(norm(r["name"]))
+        projects.append(project(r, notes.get(r["name"].lower(), {}), False))
+        seen.update({norm(r["name"]), norm(projects[-1]["title"])})
     for layer in [manual, resume, linkedin]:
         for p in (layer or {}).get("projects", []) or []:
             if norm(p.get("title")) and norm(p.get("title")) not in seen:
