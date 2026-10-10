@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
 Pull live GitHub data for the portfolio: public repos (stars, forks,
-languages, last push) plus the last year's contribution calendar.
+languages, last push), the repos pinned on your profile, plus the last year's
+contribution calendar.
 
 Writes data/github.json. Uses only the standard library so the workflow needs
-no installs. GITHUB_TOKEN is optional but avoids the 60 req/h anonymous limit.
+no installs. GITHUB_TOKEN is optional but avoids the 60 req/h anonymous limit;
+reading pinned repos needs it (GraphQL has no anonymous access), so without it
+the last known pins are kept.
 
     python scripts/sync_github.py
 """
@@ -20,6 +23,8 @@ USER = os.environ.get("GH_USER", "Awasthiutk564")
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 OUT = os.path.join(ROOT, "data", "github.json")
+# the repo this sync commits to: every sync commit bumps its pushed_at
+SELF = os.environ.get("GITHUB_REPOSITORY", f"{USER}/portfolio-website").lower()
 
 
 def get(url, accept="application/vnd.github+json"):
@@ -29,6 +34,64 @@ def get(url, accept="application/vnd.github+json"):
     with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as r:
         body = r.read().decode()
     return json.loads(body) if accept.endswith("json") else body
+
+
+def graphql(query, **variables):
+    req = urllib.request.Request(
+        "https://api.github.com/graphql",
+        data=json.dumps({"query": query, "variables": variables}).encode(),
+        headers={"User-Agent": "portfolio-sync/1.0", "Authorization": f"Bearer {TOKEN}"},
+    )
+    with urllib.request.urlopen(req, timeout=30) as r:
+        body = json.loads(r.read().decode())
+    if body.get("errors"):
+        raise RuntimeError("; ".join(e.get("message", "") for e in body["errors"]))
+    return body["data"]
+
+
+PINNED = """
+query($login: String!) {
+  user(login: $login) {
+    pinnedItems(first: 6, types: REPOSITORY) {
+      nodes {
+        ... on Repository {
+          name owner { login } url homepageUrl description isPrivate isFork isArchived
+          primaryLanguage { name } stargazerCount forkCount pushedAt
+          repositoryTopics(first: 10) { nodes { topic { name } } }
+        }
+      }
+    }
+  }
+}
+"""
+
+
+def pinned():
+    """Repos pinned on the profile, in pin order, shaped like the repo list."""
+    nodes = graphql(PINNED, login=USER)["user"]["pinnedItems"]["nodes"]
+    return [{
+        "name": n["name"],
+        "owner": n["owner"]["login"],
+        "url": n["url"],
+        "homepage": n.get("homepageUrl") or None,
+        "description": n.get("description"),
+        "language": (n.get("primaryLanguage") or {}).get("name"),
+        "topics": [t["topic"]["name"] for t in n["repositoryTopics"]["nodes"]],
+        "stars": n["stargazerCount"],
+        "forks": n["forkCount"],
+        "fork": n["isFork"],
+        "archived": n["isArchived"],
+        "pushed_at": n.get("pushedAt"),
+    } for n in nodes if n and not n.get("isPrivate")]
+
+
+def stable(data):
+    """What counts as a change: not the timestamp, and not this repo's own
+    pushed_at, which the previous sync commit just moved (an hourly sync would
+    otherwise commit and redeploy every hour forever)."""
+    mine = f"https://github.com/{SELF}"
+    fix = lambda rs: [{**r, "pushed_at": None} if r["url"].lower() == mine else r for r in rs or []]
+    return {**data, "generated_at": None, "repos": fix(data.get("repos")), "pinned": fix(data.get("pinned"))}
 
 
 class CalendarParser(HTMLParser):
@@ -123,6 +186,13 @@ def main():
     current, longest = streaks(days)
     own = [r for r in out_repos if not r["fork"]]
 
+    old = json.load(open(OUT)) if os.path.exists(OUT) else {}
+    try:
+        pins = pinned()
+    except Exception as e:  # keep the last known pins rather than reshuffling the site
+        print(f"pinned repos failed: {e}", file=sys.stderr)
+        pins = old.get("pinned", [])
+
     data = {
         "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "user": {
@@ -143,19 +213,18 @@ def main():
         },
         "languages": dict(sorted(lang_bytes.items(), key=lambda kv: -kv[1])),
         "repos": out_repos,
+        "pinned": pins,
         "contributions": days,
     }
 
-    # don't churn a commit (and a redeploy) when only the timestamp moved
-    if os.path.exists(OUT):
-        old = json.load(open(OUT))
-        if {**old, "generated_at": None} == {**data, "generated_at": None}:
-            print("github data unchanged")
-            return
+    # don't churn a commit (and a redeploy) when nothing real moved
+    if old and stable(old) == stable(data):
+        print("github data unchanged")
+        return
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(data, f, indent=2)
-    print(f"wrote {OUT}: {len(own)} repos, {data['totals']['contributions']} contributions")
+    print(f"wrote {OUT}: {len(own)} repos, {len(pins)} pinned, {data['totals']['contributions']} contributions")
 
 
 if __name__ == "__main__":
