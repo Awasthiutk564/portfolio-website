@@ -296,11 +296,11 @@
         "Systems"
       ],
       "url": "https://github.com/Awasthiutk564/Campus-Drop",
-      "homepage": null,
+      "homepage": "https://campus-drop-zeta.vercel.app",
       "language": "HTML",
       "stars": 0,
       "forks": 0,
-      "pushed_at": "2026-09-23T09:16:55Z",
+      "pushed_at": "2026-10-10T14:46:42Z",
       "featured": true
     },
     {
@@ -415,8 +415,8 @@
       "repos": 14,
       "stars": 15,
       "forks": 7,
-      "contributions": 251,
-      "active_days": 74,
+      "contributions": 257,
+      "active_days": 75,
       "current_streak": 2,
       "longest_streak": 23
     },
@@ -424,10 +424,10 @@
       "C": 33496766,
       "Python": 928487,
       "TypeScript": 472005,
-      "HTML": 127158,
+      "HTML": 116983,
       "CSS": 114589,
-      "JavaScript": 100077,
-      "C++": 13647,
+      "JavaScript": 82014,
+      "C++": 21543,
       "TeX": 360
     },
     "contributions": [
@@ -1873,7 +1873,7 @@
       },
       {
         "date": "2026-09-30",
-        "count": 0
+        "count": 1
       },
       {
         "date": "2026-10-01",
@@ -1913,17 +1913,17 @@
       },
       {
         "date": "2026-10-10",
-        "count": 1
+        "count": 6
       }
     ]
   },
   "_meta": {
-    "built_at": "2026-10-10T13:46:03Z",
+    "built_at": "2026-10-10T18:42:36Z",
     "sources": {
       "manual": true,
       "linkedin": null,
       "resume": null,
-      "github": "2026-10-10T13:46:03Z"
+      "github": "2026-10-10T18:42:36Z"
     },
     "resume_pdf": false
   }
