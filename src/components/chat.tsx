@@ -110,7 +110,7 @@ export function Chat({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
               </button>
             </header>
 
-            <div ref={log} aria-live="polite" className="flex-1 space-y-2 overflow-y-auto p-4">
+            <div ref={log} aria-live="polite" data-lenis-prevent className="flex-1 space-y-2 overflow-y-auto p-4">
               {msgs.map((m) => (
                 <motion.div
                   key={m.id}
@@ -129,7 +129,7 @@ export function Chat({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
               ))}
             </div>
 
-            <div className="flex gap-1.5 overflow-x-auto px-4 pb-3 [scrollbar-width:none]">
+            <div data-lenis-prevent-horizontal className="flex gap-1.5 overflow-x-auto px-4 pb-3 [scrollbar-width:none]">
               {QUICK.map((q) => (
                 <button key={q} type="button" onClick={() => send(q)} className="shrink-0 rounded-full border border-border px-3 py-1 text-xs text-primary/70 transition-colors hover:bg-primary hover:text-black">
                   {q}

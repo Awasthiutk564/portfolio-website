@@ -54,7 +54,7 @@ export function Activity({ p }: { p: Profile }) {
             </div>
           </div>
 
-          <div ref={wrap} className="overflow-x-auto pb-2">
+          <div ref={wrap} data-lenis-prevent-horizontal className="overflow-x-auto pb-2">
             <div
               ref={grid}
               role="img"

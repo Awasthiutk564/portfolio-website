@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { WordsPullUpMultiStyle } from "@/components/ui/prisma-hero";
 import { EASE, Reveal, SECTION_X } from "@/components/motion";
 import { ym, type Profile } from "@/lib/profile";
@@ -20,6 +20,12 @@ export function About({ p }: { p: Profile }) {
   const b = p.basics;
   const edu = p.education[0];
   const clock = useClock(b.timezone || "Asia/Kolkata");
+
+  // the photo drifts a little slower than its frame while the frame crosses the screen
+  const photo = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: photo, offset: ["start end", "end start"] });
+  const photoY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+  const still = useReducedMotion();
 
   let pct: number | null = null;
   if (edu?.start && edu?.end) {
@@ -50,13 +56,17 @@ export function About({ p }: { p: Profile }) {
       <div className="mt-20 grid grid-cols-12 gap-3 md:mt-32 md:gap-4">
         {/* photo + live local time */}
         <Reveal className="col-span-12 md:col-span-5 md:row-span-3">
-          <figure className="relative h-[460px] overflow-hidden rounded-2xl md:h-full md:min-h-[520px] md:rounded-[2rem]">
-            <img
-              src={"/" + (b.photo || "images/about-profile.jpg")}
-              alt={b.name}
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover object-[72%_center] transition-transform duration-[1.6s] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.04]"
-            />
+          <figure ref={photo} className="relative h-[460px] overflow-hidden rounded-2xl md:h-full md:min-h-[520px] md:rounded-[2rem]">
+            {/* 20% taller than the frame so the drift never shows an edge; the drift sits on
+                this wrapper because the img's hover zoom transitions its transform */}
+            <motion.div className="absolute inset-x-0 -top-[10%] h-[120%]" style={still ? undefined : { y: photoY }}>
+              <img
+                src={"/" + (b.photo || "images/about-profile.jpg")}
+                alt={b.name}
+                loading="lazy"
+                className="h-full w-full object-cover object-[72%_center] transition-transform duration-[1.6s] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.04]"
+              />
+            </motion.div>
             <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.5] mix-blend-overlay" />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/75" />
             <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 md:p-8">

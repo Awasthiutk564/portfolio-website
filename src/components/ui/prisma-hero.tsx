@@ -1,8 +1,8 @@
 // PrismaHero by rahil1202 on 21st.dev (https://21st.dev/@rahil1202/components/prisma-hero).
 // Markup, classes and motion are the original's; the copy, nav links, video and
 // CTA are props (defaulting to the original Prisma content) so the portfolio
-// can fill them in.
-import { motion, useInView, useReducedMotion } from "framer-motion";
+// can fill them in. Added: the card recedes as you scroll past it.
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -122,19 +122,32 @@ const PrismaHero = ({
   // a looping background video is motion too: hold it on its first frame
   const reduceMotion = useReducedMotion();
 
-  return (
-    <section className={cn("h-screen w-full", className)}>
-      <div className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem]">
+  // Scrolling away, the card sinks back (shrinking toward its bottom edge), the
+  // video lags behind it and the copy fades: 0 = hero at the top, 1 = gone.
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const cardScale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "8.3%"]);
+  const copyOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -80]);
 
-        {/* Background video */}
-        <video
+  return (
+    <section ref={ref} className={cn("h-screen w-full", className)}>
+      <motion.div
+        className="relative h-full w-full origin-bottom overflow-hidden rounded-2xl md:rounded-[2rem]"
+        style={reduceMotion ? undefined : { scale: cardScale }}
+      >
+
+        {/* Background video: 20% taller than the card so it can drift without showing an edge */}
+        <motion.video
           autoPlay={!reduceMotion}
           loop
           muted
           playsInline
           preload="auto"
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-x-0 -top-[10%] h-[120%] w-full object-cover"
+          style={reduceMotion ? undefined : { y: videoY }}
           src={videoSrc}
         />
 
@@ -165,7 +178,10 @@ const PrismaHero = ({
         </nav>
 
         {/* Hero content */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10">
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10"
+          style={reduceMotion ? undefined : { opacity: copyOpacity, y: copyY }}
+        >
           <div className="grid grid-cols-12 items-end gap-4">
 
             <div className="col-span-12 lg:col-span-8">
@@ -218,8 +234,8 @@ const PrismaHero = ({
 
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
