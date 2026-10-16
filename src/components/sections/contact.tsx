@@ -1,5 +1,6 @@
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { WordsPullUp } from "@/components/ui/prisma-hero";
 import { Reveal } from "@/components/motion";
 import { LiquidButton } from "@/components/ui/liquid-button";
@@ -15,6 +16,12 @@ export function Contact({ p }: { p: Profile }) {
   const [hint, setHint] = useState("click to copy");
   const [status, setStatus] = useState<Status>({ tone: "idle", text: "" });
   const [sending, setSending] = useState(false);
+
+  // the cream card grows into place as it rises, the mirror of the hero sinking away
+  const section = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: section, offset: ["start end", "start 0.2"] });
+  const cardScale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
+  const still = useReducedMotion();
 
   async function copy() {
     if (await copyText(b.email)) setHint("✓ copied to clipboard");
@@ -52,8 +59,11 @@ export function Contact({ p }: { p: Profile }) {
   }
 
   return (
-    <section id="contact" className="p-2 md:p-3">
-      <div className="relative overflow-hidden rounded-2xl bg-primary text-black md:rounded-[2rem]">
+    <section ref={section} id="contact" className="p-2 md:p-3">
+      <motion.div
+        className="relative origin-top overflow-hidden rounded-2xl bg-primary text-black md:rounded-[2rem]"
+        style={still ? undefined : { scale: cardScale }}
+      >
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.35] mix-blend-multiply" />
 
         <div className="relative grid grid-cols-12 gap-x-4 gap-y-14 px-4 pt-16 sm:px-6 md:px-10 md:pt-24">
@@ -129,7 +139,7 @@ export function Contact({ p }: { p: Profile }) {
             </h2>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

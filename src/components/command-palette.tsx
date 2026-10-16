@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EASE } from "@/components/motion";
 import type { Profile } from "@/lib/profile";
+import { scrollToSection } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 
 type Item = { ic: string; label: string; hint?: string; run: () => void };
@@ -32,7 +33,7 @@ export function CommandPalette({ p, open, setOpen, copyEmail, openChat }: Props)
 
   const items = useMemo<Item[]>(() => {
     const b = p.basics;
-    const go = (id: string) => () => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const go = (id: string) => () => scrollToSection(id);
     const ext = (url: string) => () => window.open(url, "_blank", "noopener");
     return [
       { ic: "#", label: "About", hint: "section", run: go("about") },
@@ -126,7 +127,7 @@ export function CommandPalette({ p, open, setOpen, copyEmail, openChat }: Props)
               aria-label="Search commands"
               className="w-full border-b border-border bg-transparent px-5 py-4 text-base outline-none placeholder:text-primary/35"
             />
-            <ul ref={list} role="listbox" className="max-h-[50vh] overflow-y-auto p-2">
+            <ul ref={list} role="listbox" data-lenis-prevent className="max-h-[50vh] overflow-y-auto p-2">
               {shown.length ? (
                 shown.map((it, i) => (
                   <li

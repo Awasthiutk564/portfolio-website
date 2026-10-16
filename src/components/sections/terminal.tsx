@@ -163,6 +163,7 @@ export function Terminal({ p }: { p: Profile }) {
           </div>
           <div
             ref={body}
+            data-lenis-prevent
             className="h-[420px] overflow-y-auto p-5 font-mono text-[12.5px] leading-relaxed text-primary/80 md:h-[460px] md:p-7 md:text-[13.5px]"
             onClick={() => { if (!getSelection()?.toString()) input.current?.focus({ preventScroll: true }); }}
           >

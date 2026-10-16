@@ -1,6 +1,6 @@
 // Motion primitives shared by every section. They reuse the PrismaHero curve
 // and offsets so scrolling the page feels like the hero's entrance.
-import { animate, motion, useInView, useReducedMotion } from "framer-motion";
+import { animate, motion, useInView, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { WordsPullUp } from "@/components/ui/prisma-hero";
 import { cn } from "@/lib/utils";
@@ -86,5 +86,18 @@ export function Counter({ value, className }: { value: number; className?: strin
     <span ref={ref} className={cn("tabular-nums", className)}>
       0
     </span>
+  );
+}
+
+/** Hairline across the top of the viewport that fills as you read down the page. */
+export function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 260, damping: 40, restDelta: 0.001 });
+  return (
+    <motion.div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-px origin-left bg-primary/70"
+      style={{ scaleX }}
+    />
   );
 }
