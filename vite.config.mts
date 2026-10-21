@@ -26,13 +26,21 @@ export default defineConfig({
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
   build: {
+    // the robot's lazy chunk is three.js, which alone is past the default 500 kB
+    chunkSizeWarningLimit: 1000,
     rolldownOptions: {
       output: {
-        // Libraries in their own file: the site redeploys on every data sync, and
-        // this way returning visitors keep the (unchanged) libraries cached.
-        // Lenis stays out so it is still only fetched for a mouse or trackpad.
+        // The libraries every visit loads, in their own file: the site redeploys
+        // on every data sync, and this way returning visitors keep the
+        // (unchanged) libraries cached. Only these: anything else (Lenis, three.js
+        // for the robot) stays in the lazy chunks that need it.
         codeSplitting: {
-          groups: [{ name: "vendor", test: /[\\/]node_modules[\\/](?!lenis[\\/])/ }],
+          groups: [
+            {
+              name: "vendor",
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|framer-motion|motion-dom|motion-utils|lucide-react|clsx|tailwind-merge)[\\/]/,
+            },
+          ],
         },
       },
     },

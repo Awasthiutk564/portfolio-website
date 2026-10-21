@@ -1,31 +1,32 @@
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { Component, Suspense, lazy, useRef } from "react";
 import { WordsPullUpMultiStyle } from "@/components/ui/prisma-hero";
 import { EASE, Parallax, Reveal, SECTION_X } from "@/components/motion";
 import { ym, type Profile } from "@/lib/profile";
 
+// three.js is heavy: the robot's code is only fetched as the section comes near
+const Robot = lazy(() => import("@/components/ui/robot-hero"));
+
 const card = "h-full rounded-2xl border border-border bg-card p-6 md:rounded-[2rem] md:p-8";
 const label = "text-sm text-primary/50";
 
-function useClock(timeZone: string) {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  return new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(now);
+/** Without WebGL (or if its code fails to load) the robot's frame just stays empty. */
+class Quietly extends Component<{ children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
 }
 
 export function About({ p }: { p: Profile }) {
   const b = p.basics;
   const edu = p.education[0];
-  const clock = useClock(b.timezone || "Asia/Kolkata");
 
-  // the photo drifts a little slower than its frame while the frame crosses the screen
-  const photo = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: photo, offset: ["start end", "end start"] });
-  const photoY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
-  const still = useReducedMotion();
+  const stage = useRef<HTMLDivElement>(null);
+  const near = useInView(stage, { once: true, margin: "600px" });
 
   let pct: number | null = null;
   if (edu?.start && edu?.end) {
@@ -56,32 +57,24 @@ export function About({ p }: { p: Profile }) {
       </Parallax>
 
       <div className="mt-20 grid grid-cols-12 gap-3 md:mt-32 md:gap-4">
-        {/* photo + live local time */}
+        {/* the robot: it follows the cursor, and blinks; tap it for heart eyes */}
         <Reveal className="col-span-12 md:col-span-5 md:row-span-3">
-          <figure ref={photo} className="relative h-[460px] overflow-hidden rounded-2xl md:h-full md:min-h-[520px] md:rounded-[2rem]">
-            {/* 20% taller than the frame so the drift never shows an edge; the drift sits on
-                this wrapper because the img's hover zoom transitions its transform */}
-            <motion.div className="absolute inset-x-0 -top-[10%] h-[120%]" style={still ? undefined : { y: photoY }}>
-              <img
-                src={"/" + (b.photo || "images/about-profile.jpg")}
-                alt={b.name}
-                loading="lazy"
-                className="h-full w-full object-cover object-[72%_center] transition-transform duration-[1.6s] ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.04]"
-              />
-            </motion.div>
-            <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.5] mix-blend-overlay" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/75" />
-            <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 md:p-8">
-              <div>
-                <p className="text-2xl font-medium tracking-[-0.04em] md:text-3xl">{b.name}</p>
-                <p className="mt-1 text-sm text-primary/70">{b.location}</p>
-              </div>
-              <p className="text-right">
-                <span className="block font-mono text-lg tabular-nums md:text-xl" aria-label="Local time">{clock}</span>
-                <span className="text-xs text-primary/60">local time</span>
-              </p>
-            </figcaption>
-          </figure>
+          <div
+            ref={stage}
+            aria-hidden="true"
+            className="relative h-[460px] overflow-hidden rounded-2xl border border-border bg-card md:h-full md:min-h-[520px] md:rounded-[2rem]"
+          >
+            {/* a warm glow behind the head and a pale pool of light on the floor */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_38%_at_50%_40%,rgba(240,163,107,0.12),transparent_70%),radial-gradient(48%_16%_at_50%_75%,rgba(225,224,204,0.16),transparent_75%)]" />
+            <span className="cover-dots pointer-events-none absolute inset-0" />
+            {near && (
+              <Quietly>
+                <Suspense fallback={null}>
+                  <Robot scale={1.8} />
+                </Suspense>
+              </Quietly>
+            )}
+          </div>
         </Reveal>
 
         <Reveal className="col-span-12 md:col-span-7" delay={0.08}>
