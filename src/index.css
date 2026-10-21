@@ -218,17 +218,6 @@
   animation: ping-soft 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* contribution calendar cells fade in column by column */
-.heat i {
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity 0.5s var(--ease-prisma), transform 0.5s var(--ease-prisma);
-}
-.heat.in i {
-  opacity: 1;
-  transform: none;
-}
-
 /* terminal output (built from escaped strings, like the old shell) */
 .term pre {
   margin: 0;
@@ -615,6 +604,5 @@
   html { scroll-behavior: auto; }
   .marquee-track, .ping-soft, .liquid-rim, .liquid-metal { animation: none; }
   .liquid-btn:hover .liquid-sheen { animation: none; opacity: 0; }
-  .heat i { transition: none; }
   .mo-ring, .mo-aurora, .mo-lab-t, .mo-dots i { animation: none; }
 }
