@@ -1,7 +1,7 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { WordsPullUpMultiStyle } from "@/components/ui/prisma-hero";
-import { EASE, Reveal, SECTION_X } from "@/components/motion";
+import { EASE, Parallax, Reveal, SECTION_X } from "@/components/motion";
 import { ym, type Profile } from "@/lib/profile";
 
 const card = "h-full rounded-2xl border border-border bg-card p-6 md:rounded-[2rem] md:p-8";
@@ -42,6 +42,7 @@ export function About({ p }: { p: Profile }) {
         </p>
       </Reveal>
 
+      <Parallax depth={50}>
       <h2 className="mx-auto mt-10 max-w-[90rem] text-center font-medium leading-[0.95] tracking-[-0.05em] text-[9.5vw] md:mt-14 md:text-[5.4vw]">
         <WordsPullUpMultiStyle
           segments={[
@@ -52,6 +53,7 @@ export function About({ p }: { p: Profile }) {
           ]}
         />
       </h2>
+      </Parallax>
 
       <div className="mt-20 grid grid-cols-12 gap-3 md:mt-32 md:gap-4">
         {/* photo + live local time */}

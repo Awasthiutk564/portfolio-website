@@ -47,6 +47,21 @@ function attach(l: Lenis) {
   };
 }
 
+/** Scroll the page to a y position, gliding when smooth scroll is on. */
+export function scrollToY(y: number) {
+  if (lenis) lenis.scrollTo(y, glide);
+  else window.scrollTo({ top: y, behavior: "smooth" });
+}
+
+/** Freeze page scrolling (an overlay is open) or release it. */
+export function lockScroll(on: boolean) {
+  if (lenis) {
+    if (on) lenis.stop();
+    else lenis.start();
+  }
+  document.documentElement.style.overflow = on ? "hidden" : "";
+}
+
 /** Scroll to a section by id, gliding when smooth scroll is on. */
 export function scrollToSection(id: string) {
   const el = document.getElementById(id);

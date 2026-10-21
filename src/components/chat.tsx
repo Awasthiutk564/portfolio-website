@@ -1,15 +1,18 @@
-// Booglu chat widget -> POST /api/chat (Gemini on the server, with a local
-// fallback). The server builds Booglu's knowledge from the same profile.json.
+// Booglu, Utkarsh's AI assistant -> POST /api/chat (Gemini on the server, with
+// a local fallback). The server builds Booglu's knowledge from the same
+// profile.json. Asking opens the thinking orb: the pill flies up into a dotted
+// orb while Booglu thinks, condenses, and unfolds into the answer.
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
+import { Suspense, lazy, useCallback, useEffect, useRef } from "react";
 import { EASE } from "@/components/motion";
-import { cn } from "@/lib/utils";
+import { lockScroll } from "@/lib/smooth-scroll";
 
-type Msg = { id: number; who: "me" | "bot"; text: string; typing?: boolean };
+// the orb is only fetched when someone heads for the button
+const loadOrb = () => import("@/components/ui/ai-thiking-orb-and-input");
+const MorphOrb = lazy(loadOrb);
 
 const QUICK = ["Who is Utkarsh?", "What's he building now?", "Top projects?", "Is he open to internships?"];
-const GREETING = "Hey! 👋 I'm Booglu, Utkarsh's AI assistant. I'm synced with his latest résumé, LinkedIn and GitHub. Ask me anything.";
 
 function readSid() {
   try {
@@ -20,44 +23,29 @@ function readSid() {
 }
 
 export function Chat({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
-  const [msgs, setMsgs] = useState<Msg[]>([]);
-  const [text, setText] = useState("");
   const sid = useRef<string | null>(readSid());
-  const nextId = useRef(0);
-  const log = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
   const fab = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
 
+  // the page stays put behind the assistant; focus goes back to the button after
   useEffect(() => {
-    if (!open) return;
-    const greetId = nextId.current++;
-    setMsgs((m) => (m.length ? m : [{ id: greetId, who: "bot", text: GREETING }]));
-    input.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        fab.current?.focus();
-      }
-    };
-    addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
-  }, [open, setOpen]);
+    if (open) lockScroll(true);
+    else if (wasOpen.current) {
+      lockScroll(false);
+      fab.current?.focus();
+    }
+    wasOpen.current = open;
+  }, [open]);
+  useEffect(() => () => lockScroll(false), []);
 
-  useEffect(() => {
-    if (log.current) log.current.scrollTop = log.current.scrollHeight;
-  }, [msgs]);
+  const close = useCallback(() => setOpen(false), [setOpen]);
 
-  async function send(raw: string) {
-    const t = raw.trim();
-    if (!t) return;
-    const meId = nextId.current++, typingId = nextId.current++;
-    setMsgs((m) => [...m, { id: meId, who: "me", text: t }, { id: typingId, who: "bot", text: "Booglu is typing…", typing: true }]);
-    let reply: string;
+  const ask = useCallback(async (message: string) => {
     try {
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: t, sessionId: sid.current }),
+        body: JSON.stringify({ message, sessionId: sid.current }),
       });
       const data = await r.json();
       if (data.sessionId) {
@@ -66,12 +54,11 @@ export function Chat({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
           sessionStorage.setItem("booglu-sid", data.sessionId);
         } catch {}
       }
-      reply = data.reply || data.error || "Hmm, I lost my train of thought. Try again?";
+      return data.reply || data.error || "Hmm, I lost my train of thought. Try again?";
     } catch {
-      reply = "I can't reach my brain right now. Email Utkarsh directly from the contact section!";
+      return "I can't reach my brain right now. Email Utkarsh directly from the contact section!";
     }
-    setMsgs((m) => m.map((x) => (x.id === typingId ? { ...x, text: reply, typing: false } : x)));
-  }
+  }, []);
 
   return (
     <>
@@ -79,6 +66,8 @@ export function Chat({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
         ref={fab}
         type="button"
         onClick={() => setOpen(!open)}
+        onPointerEnter={loadOrb}
+        onFocus={loadOrb}
         aria-label="Chat with Booglu, Utkarsh's AI assistant"
         aria-expanded={open}
         className="group fixed bottom-4 right-4 z-50 inline-flex items-center gap-2 rounded-full bg-primary py-1 pl-1 pr-1 text-sm font-medium text-black shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] transition-all hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 sm:pr-5 md:bottom-6 md:right-6"
@@ -91,75 +80,47 @@ export function Chat({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
 
       <AnimatePresence>
         {open && (
-          <motion.section
-            aria-label="Booglu chat"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="fixed bottom-20 right-4 z-50 flex h-[min(560px,72vh)] w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.5rem] border border-border bg-card shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9)] md:bottom-24 md:right-6"
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Booglu, Utkarsh's AI assistant"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
+            className="fixed inset-0 z-[60] backdrop-blur-md"
           >
-            <header className="flex items-center gap-3 border-b border-border p-4">
-              <img src="/images/booglu-avatar.png" alt="" className="h-10 w-10 rounded-full object-cover" />
-              <div className="min-w-0 flex-1">
-                <p className="font-medium tracking-[-0.02em]">Booglu</p>
-                <p className="truncate text-xs text-primary/50">Utkarsh's AI assistant · knows his latest résumé</p>
-              </div>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close chat" className="rounded-full p-2 text-primary/60 transition-colors hover:bg-primary/10 hover:text-primary">
-                <X className="h-4 w-4" />
-              </button>
-            </header>
-
-            <div ref={log} aria-live="polite" data-lenis-prevent className="flex-1 space-y-2 overflow-y-auto p-4">
-              {msgs.map((m) => (
-                <motion.div
-                  key={m.id}
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.4, ease: EASE }}
-                  className={cn(
-                    "max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm",
-                    m.who === "me" ? "ml-auto rounded-br-md bg-primary text-black" : "rounded-bl-md bg-primary/[0.08] text-primary/90",
-                    m.typing && "animate-pulse text-primary/50",
-                  )}
-                  style={{ lineHeight: 1.4 }}
-                >
-                  {m.text}
-                </motion.div>
-              ))}
-            </div>
-
-            <div data-lenis-prevent-horizontal className="flex gap-1.5 overflow-x-auto px-4 pb-3 [scrollbar-width:none]">
-              {QUICK.map((q) => (
-                <button key={q} type="button" onClick={() => send(q)} className="shrink-0 rounded-full border border-border px-3 py-1 text-xs text-primary/70 transition-colors hover:bg-primary hover:text-black">
-                  {q}
-                </button>
-              ))}
-            </div>
-
-            <form
-              className="flex items-center gap-2 border-t border-border p-3"
-              autoComplete="off"
-              onSubmit={(e) => {
-                e.preventDefault();
-                send(text);
-                setText("");
-              }}
+            <Suspense fallback={null}>
+            <MorphOrb
+              onSubmit={ask}
+              onClose={close}
+              minThinkMs={1400}
+              suggestions={QUICK}
+              placeholder="Ask Booglu about Utkarsh…"
+              answerTitle="Booglu"
+              reset="Ask another"
+              intro={
+                <div className="flex flex-col items-center gap-4">
+                  <img src="/images/booglu-avatar.png" alt="" className="h-16 w-16 rounded-full object-cover ring-1 ring-primary/20" />
+                  <div>
+                    <p className="text-3xl font-medium tracking-[-0.04em] md:text-4xl">
+                      Hi, I'm Booglu. <span className="font-serif font-normal italic">Ask away.</span>
+                    </p>
+                    <p className="mt-2 text-sm text-primary/55">Utkarsh's AI assistant, synced with his résumé, LinkedIn and GitHub.</p>
+                  </div>
+                </div>
+              }
+            />
+            </Suspense>
+            <button
+              type="button"
+              onClick={close}
+              aria-label="Close Booglu"
+              className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-border text-primary/70 transition-colors hover:bg-primary hover:text-black md:right-6 md:top-6"
             >
-              <input
-                ref={input}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Ask about Utkarsh…"
-                aria-label="Message Booglu"
-                maxLength={500}
-                className="min-w-0 flex-1 rounded-full bg-primary/[0.06] px-4 py-2.5 text-sm outline-none placeholder:text-primary/35 focus:bg-primary/10"
-              />
-              <button type="submit" aria-label="Send" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-black transition-transform hover:scale-105">
-                <ArrowUp className="h-4 w-4" />
-              </button>
-            </form>
-          </motion.section>
+              <X className="h-4 w-4" />
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

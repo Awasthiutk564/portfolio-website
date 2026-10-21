@@ -25,6 +25,18 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Libraries in their own file: the site redeploys on every data sync, and
+        // this way returning visitors keep the (unchanged) libraries cached.
+        // Lenis stays out so it is still only fetched for a mouse or trackpad.
+        codeSplitting: {
+          groups: [{ name: "vendor", test: /[\\/]node_modules[\\/](?!lenis[\\/])/ }],
+        },
+      },
+    },
+  },
   server: {
     // the Express API (server.js) runs alongside on :3000 during `npm run dev`
     proxy: {

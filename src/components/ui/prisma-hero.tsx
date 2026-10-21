@@ -1,8 +1,18 @@
 // PrismaHero by rahil1202 on 21st.dev (https://21st.dev/@rahil1202/components/prisma-hero).
 // Markup, classes and motion are the original's; the copy, nav links, video and
 // CTA are props (defaulting to the original Prisma content) so the portfolio
-// can fill them in. Added: the card recedes as you scroll past it.
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+// can fill them in. Added: the card recedes as you scroll past it, and tilts
+// toward the cursor like a card held in the hand.
+import {
+  motion,
+  useInView,
+  useMotionTemplate,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -131,31 +141,79 @@ const PrismaHero = ({
   const copyOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
   const copyY = useTransform(scrollYProgress, [0, 1], [0, -80]);
 
+  // Cursor tilt: px/py run -1..1 across the card and settle on a spring. The
+  // card turns a few degrees toward the pointer, the video behind shifts the
+  // other way and the copy in front follows it, so the layers read as depth;
+  // a soft glare tracks the pointer. Mouse or trackpad only.
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const spring = { stiffness: 120, damping: 18, mass: 0.6 };
+  const sx = useSpring(px, spring);
+  const sy = useSpring(py, spring);
+  const rotateY = useTransform(sx, [-1, 1], [-2.2, 2.2]);
+  const rotateX = useTransform(sy, [-1, 1], [1.6, -1.6]);
+  const videoX = useTransform(sx, [-1, 1], [14, -14]);
+  const videoYTilt = useTransform(sy, [-1, 1], [8, -8]);
+  const copyX = useTransform(sx, [-1, 1], [-8, 8]);
+  const glareX = useTransform(sx, [-1, 1], [0, 100]);
+  const glareY = useTransform(sy, [-1, 1], [0, 100]);
+  const glareOn = useSpring(0, { stiffness: 80, damping: 20 });
+  const glare = useMotionTemplate`radial-gradient(55% 65% at ${glareX}% ${glareY}%, rgba(255,255,255,0.32), transparent 70%)`;
+
+  const tilt = (e: React.PointerEvent<HTMLElement>) => {
+    if (reduceMotion || e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    px.set(((e.clientX - r.left) / r.width) * 2 - 1);
+    py.set(((e.clientY - r.top) / r.height) * 2 - 1);
+    glareOn.set(1);
+  };
+  const untilt = () => {
+    px.set(0);
+    py.set(0);
+    glareOn.set(0);
+  };
+
   return (
-    <section ref={ref} className={cn("h-screen w-full", className)}>
+    <section ref={ref} className={cn("h-screen w-full", className)} onPointerMove={tilt} onPointerLeave={untilt}>
       <motion.div
-        className="relative h-full w-full origin-bottom overflow-hidden rounded-2xl md:rounded-[2rem]"
+        className="h-full w-full origin-bottom [perspective:1400px]"
         style={reduceMotion ? undefined : { scale: cardScale }}
       >
+      <motion.div
+        className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem]"
+        style={reduceMotion ? undefined : { rotateX, rotateY }}
+      >
 
-        {/* Background video: 20% taller than the card so it can drift without showing an edge */}
-        <motion.video
-          autoPlay={!reduceMotion}
-          loop
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-          className="absolute inset-x-0 -top-[10%] h-[120%] w-full object-cover"
-          style={reduceMotion ? undefined : { y: videoY }}
-          src={videoSrc}
-        />
+        {/* Background video: taller and wider than the card so it can drift with
+            the scroll and the cursor without showing an edge */}
+        <motion.div className="absolute inset-0" style={reduceMotion ? undefined : { x: videoX, y: videoYTilt }}>
+          <motion.video
+            autoPlay={!reduceMotion}
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            className="absolute -left-[3%] -top-[10%] h-[120%] w-[106%] max-w-none object-cover"
+            style={reduceMotion ? undefined : { y: videoY }}
+            src={videoSrc}
+          />
+        </motion.div>
 
         {/* Noise overlay */}
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.7] mix-blend-overlay" />
 
         {/* Gradient overlay */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+
+        {/* Glare that follows the cursor */}
+        {!reduceMotion && (
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 mix-blend-soft-light"
+            style={{ background: glare, opacity: glareOn }}
+          />
+        )}
 
         {/* Navbar */}
         <nav className="absolute left-1/2 top-0 z-20 -translate-x-1/2" aria-label="Sections">
@@ -180,7 +238,7 @@ const PrismaHero = ({
         {/* Hero content */}
         <motion.div
           className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10"
-          style={reduceMotion ? undefined : { opacity: copyOpacity, y: copyY }}
+          style={reduceMotion ? undefined : { opacity: copyOpacity, y: copyY, x: copyX }}
         >
           <div className="grid grid-cols-12 items-end gap-4">
 
@@ -235,6 +293,7 @@ const PrismaHero = ({
             </div>
           </div>
         </motion.div>
+      </motion.div>
       </motion.div>
     </section>
   );
