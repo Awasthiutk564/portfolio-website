@@ -1,13 +1,97 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EASE, Reveal, SECTION_X, SectionHead } from "@/components/motion";
 import { LiquidButton } from "@/components/ui/liquid-button";
+import { WorksWheel } from "@/components/ui/works-wheel";
 import { ago, pad2, type Profile, type Project } from "@/lib/profile";
+import { scrollToY } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 
 const VISIBLE = 8;
+/** projects on the wheel (featured first); the rest are a click away on GitHub */
+const WHEEL = 8;
+/** page scroll per wheel step, in viewport heights */
+const STEP_VH = 45;
 const keysOf = (x: Project) => [...new Set([x.language, ...(x.tags || [])].filter(Boolean) as string[])];
+
+/** A project's card face on the wheel: the site's dark card, with a halftone
+    corner like the footer, sized in container units so it scales with the card. */
+function Cover({ x, i }: { x: Project; i: number }) {
+  return (
+    <span className="@container block size-full bg-card text-left text-primary">
+      <span className="relative flex size-full flex-col justify-between p-[6cqw]">
+        <span aria-hidden="true" className="cover-dots pointer-events-none absolute inset-0" />
+        <span className="relative flex items-start justify-between font-mono text-[2.5cqw] uppercase tracking-[0.18em] text-primary/45">
+          <span>{pad2(i + 1)}</span>
+          <span>{x.language || "—"}</span>
+        </span>
+        <span className="relative block">
+          <span className="block font-serif text-[7.4cqw] italic leading-[1]">{x.tagline || x.title}</span>
+          {x.description && (
+            <span className="mt-[2.4cqw] line-clamp-2 text-[2.9cqw] leading-snug text-primary/55">{x.description}</span>
+          )}
+        </span>
+        <span className="relative flex flex-wrap gap-x-[3cqw] font-mono text-[2.3cqw] text-primary/45">
+          <span>★ {x.stars || 0}</span>
+          <span>⑂ {x.forks || 0}</span>
+          {x.pushed_at && <span>updated {ago(x.pushed_at)}</span>}
+          {x.homepage && <span className="text-primary/80">live ↗</span>}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+const smooth = (t: number) => t * t * (3 - 2 * t);
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+/** Scroll position (in steps) → wheel turn. The ring holds for a moment, then
+    opens; after that each project rests at the front for half a step before the
+    next one turns in, so every card gets a clear look. */
+function turnAt(x: number, n: number) {
+  if (x <= 1) return smooth(clamp01((x - 0.2) / 0.8));
+  const v = x - 1;
+  const i = Math.floor(v);
+  return Math.min(n, 1 + i + smooth(clamp01((v - i - 0.45) / 0.55)));
+}
+
+/** The wheel pinned in a tall track: scrolling the page turns it, so it moves
+    with smooth scroll and never captures the mouse wheel. */
+function WheelStage({ items }: { items: Project[] }) {
+  const track = useRef<HTMLDivElement>(null);
+  const goal = useRef(0);
+  const n = items.length;
+  const steps = n + 0.6; // the ring opening, one per project, and a rest after the last
+  const { scrollYProgress } = useScroll({ target: track, offset: ["start start", "end end"] });
+  useMotionValueEvent(scrollYProgress, "change", (p) => (goal.current = turnAt(p * steps, n)));
+  useEffect(() => {
+    goal.current = turnAt(scrollYProgress.get() * steps, n);
+  }, [scrollYProgress, steps, n]);
+
+  // bring project i to the front: scroll to the start of its resting spot
+  const pick = (i: number) => {
+    const el = track.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + scrollY;
+    scrollToY(top + ((1 + i + 0.2) / steps) * (el.offsetHeight - innerHeight));
+  };
+
+  return (
+    <div ref={track} className="relative hidden md:block" style={{ height: `calc(100svh + ${steps * STEP_VH}svh)` }}>
+      <div className="sticky top-0 h-[100svh]">
+        <WorksWheel
+          items={items.map((x, i) => ({ title: x.title, href: x.url, cover: <Cover x={x} i={i} /> }))}
+          label={`Works '${String(new Date().getFullYear()).slice(-2)}`}
+          action="Open repo"
+          goal={goal}
+          onPick={pick}
+          className="font-medium tracking-[-0.04em]"
+        />
+      </div>
+    </div>
+  );
+}
 
 function ProjectRow({ x, i }: { x: Project; i: number }) {
   return (
@@ -88,10 +172,36 @@ export function Work({ p }: { p: Profile }) {
   const filtered = filter === "All" ? list : list.filter((x) => keysOf(x).includes(filter));
   const shown = filter === "All" && !expanded ? filtered.slice(0, VISIBLE) : filtered;
 
-  return (
-    <section id="work" className={`${SECTION_X} py-24 md:py-36`}>
-      <SectionHead index="02" label="Selected work" title="Things I've shipped" sub="Pulled live from the GitHub API. New repos show up here automatically." />
+  const github = p.basics.profiles.find((x) => x.network === "GitHub")?.url;
 
+  return (
+    <section id="work" className="py-24 md:py-36">
+      <div className={SECTION_X}>
+        <SectionHead
+          index="02"
+          label="Selected work"
+          title="Things I've shipped"
+          sub={
+            <>
+              Pulled live from the GitHub API. New repos show up here automatically.
+              <span className="hidden md:inline"> Keep scrolling to turn the wheel.</span>
+            </>
+          }
+        />
+      </div>
+
+      {/* desktop: the works wheel */}
+      <WheelStage items={list.slice(0, WHEEL)} />
+      {github && list.length > WHEEL && (
+        <Reveal className={`${SECTION_X} mt-12 hidden md:block`}>
+          <LiquidButton href={`${github}?tab=repositories`} target="_blank" rel="noopener" icon={<ArrowUpRight className="h-4 w-4" />}>
+            All {list.length} projects on GitHub
+          </LiquidButton>
+        </Reveal>
+      )}
+
+      {/* phones: the list, where the wheel's cards would be too small to read */}
+      <div className={`${SECTION_X} md:hidden`}>
       <Reveal>
         <div className="mb-10 flex flex-wrap gap-2" role="tablist" aria-label="Filter projects">
           {["All", ...keys].map((k) => {
@@ -128,6 +238,7 @@ export function Work({ p }: { p: Profile }) {
           </LiquidButton>
         </Reveal>
       )}
+      </div>
     </section>
   );
 }

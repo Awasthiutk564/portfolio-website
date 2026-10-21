@@ -1,4 +1,7 @@
-import { Counter, Reveal, SECTION_X } from "@/components/motion";
+import { Counter, Parallax, Reveal, SECTION_X } from "@/components/motion";
+
+// each number sits at its own depth, so the row shears slightly as it passes
+const DEPTHS = [18, 46, 26, 54, 34];
 import type { Profile } from "@/lib/profile";
 
 export function Stats({ p }: { p: Profile }) {
@@ -16,10 +19,12 @@ export function Stats({ p }: { p: Profile }) {
       <div className="grid grid-cols-2 gap-x-4 gap-y-12 border-y border-border py-14 md:grid-cols-5 md:py-20">
         {items.map((it, i) => (
           <Reveal key={it.label} delay={i * 0.08} className={i === items.length - 1 ? "col-span-2 md:col-span-1" : ""}>
-            <p className="font-medium leading-[0.85] tracking-[-0.07em] text-[19vw] md:text-[7.5vw]">
-              <Counter value={it.value} />
-            </p>
-            <p className="mt-3 text-sm text-primary/50">{it.label}</p>
+            <Parallax depth={DEPTHS[i % DEPTHS.length]}>
+              <p className="font-medium leading-[0.85] tracking-[-0.07em] text-[19vw] md:text-[7.5vw]">
+                <Counter value={it.value} />
+              </p>
+              <p className="mt-3 text-sm text-primary/50">{it.label}</p>
+            </Parallax>
           </Reveal>
         ))}
       </div>
