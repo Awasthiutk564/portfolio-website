@@ -1,8 +1,9 @@
 // PrismaHero by rahil1202 on 21st.dev (https://21st.dev/@rahil1202/components/prisma-hero).
 // Markup, classes and motion are the original's; the copy, nav links, video and
 // CTA are props (defaulting to the original Prisma content) so the portfolio
-// can fill them in. Added: the card recedes as you scroll past it, and tilts
-// toward the cursor like a card held in the hand.
+// can fill them in. Added: the card recedes as you scroll past it, tilts
+// toward the cursor like a card held in the hand, and the notch navbar fades
+// as soon as the page moves (the floating glass navbar takes over).
 import {
   motion,
   useInView,
@@ -140,6 +141,9 @@ const PrismaHero = ({
   const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "8.3%"]);
   const copyOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
   const copyY = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const notchOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+  const notchY = useTransform(scrollYProgress, [0, 0.05], ["0%", "-70%"]);
+  const notchEvents = useTransform(scrollYProgress, (v) => (v > 0.03 ? "none" : "auto"));
 
   // Cursor tilt: px/py run -1..1 across the card and settle on a spring. The
   // card turns a few degrees toward the pointer, the video behind shifts the
@@ -216,7 +220,11 @@ const PrismaHero = ({
         )}
 
         {/* Navbar */}
-        <nav className="absolute left-1/2 top-0 z-20 -translate-x-1/2" aria-label="Sections">
+        <motion.nav
+          className="absolute left-1/2 top-0 z-20 -translate-x-1/2"
+          aria-label="Sections"
+          style={{ opacity: notchOpacity, pointerEvents: notchEvents, ...(reduceMotion ? {} : { y: notchY }) }}
+        >
           <div className="flex items-center gap-3 rounded-b-2xl bg-black px-4 py-2 sm:gap-6 md:gap-12 md:rounded-b-3xl md:px-8 lg:gap-14">
             {navItems.map((item) => (
               <a
@@ -233,7 +241,7 @@ const PrismaHero = ({
               </a>
             ))}
           </div>
-        </nav>
+        </motion.nav>
 
         {/* Hero content */}
         <motion.div
