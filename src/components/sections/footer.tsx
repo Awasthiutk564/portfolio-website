@@ -77,7 +77,6 @@ export function Footer({ p }: { p: Profile }) {
             ],
           },
         ]}
-        note={<>Hero, wheel, orb &amp; footer from 21st.dev · ⌘K to search</>}
         palette={{ background: "#000000", ink: "#e1e0cc", warm: "#f0a36b" }}
         fontFamily={SANS}
         fontWeight={600}
