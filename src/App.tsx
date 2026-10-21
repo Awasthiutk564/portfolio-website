@@ -1,5 +1,5 @@
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { PrismaHero, type PrismaNavItem } from "@/components/ui/prisma-hero";
 import { LiquidButton, LiquidMetalDefs } from "@/components/ui/liquid-button";
@@ -7,7 +7,7 @@ import { Latest } from "@/components/sections/latest";
 import { FloatingNav } from "@/components/floating-nav";
 import { CommandPalette } from "@/components/command-palette";
 import { Chat } from "@/components/chat";
-import { EASE } from "@/components/motion";
+import { EASE, ScrollProgress } from "@/components/motion";
 import { About } from "@/components/sections/about";
 import { Stats } from "@/components/sections/stats";
 import { Work } from "@/components/sections/work";
@@ -18,6 +18,7 @@ import { Terminal } from "@/components/sections/terminal";
 import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/sections/footer";
 import { copyText, profile as p } from "@/lib/profile";
+import { startSmoothScroll } from "@/lib/smooth-scroll";
 
 const NAV: PrismaNavItem[] = [
   { label: "About", href: "#about" },
@@ -46,6 +47,8 @@ export default function App() {
 
   const openChat = useCallback(() => setChatOpen(true), []);
 
+  useEffect(() => startSmoothScroll(), []);
+
   return (
     <MotionConfig reducedMotion="user">
       <LiquidMetalDefs />
@@ -56,6 +59,7 @@ export default function App() {
         Skip to content
       </a>
 
+      <ScrollProgress />
       <FloatingNav items={NAV} onSearch={() => setPaletteOpen(true)} />
 
       <main>

@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+// Inertial wheel scrolling (Lenis), so the page glides instead of stepping and
+// the scroll-linked motion in the sections follows it smoothly. Only loaded for
+// a mouse or trackpad: touch keeps the phone's native momentum, and
+// reduced-motion users keep plain scrolling.
+>>>>>>> 7eb4d57c01527b17274da3025bf04ad92a3237e1
 import type Lenis from "lenis";
 import "lenis/dist/lenis.css";
 
@@ -43,6 +50,24 @@ function attach(l: Lenis) {
   };
 }
 
+<<<<<<< HEAD
+=======
+/** Scroll the page to a y position, gliding when smooth scroll is on. */
+export function scrollToY(y: number) {
+  if (lenis) lenis.scrollTo(y, glide);
+  else window.scrollTo({ top: y, behavior: "smooth" });
+}
+
+/** Freeze page scrolling (an overlay is open) or release it. */
+export function lockScroll(on: boolean) {
+  if (lenis) {
+    if (on) lenis.stop();
+    else lenis.start();
+  }
+  document.documentElement.style.overflow = on ? "hidden" : "";
+}
+
+>>>>>>> 7eb4d57c01527b17274da3025bf04ad92a3237e1
 /** Scroll to a section by id, gliding when smooth scroll is on. */
 export function scrollToSection(id: string) {
   const el = document.getElementById(id);
