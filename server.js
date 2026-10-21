@@ -451,7 +451,11 @@ function getLocalBoogluResponse(message) {
     if (msg.match(/education|study|college|university|school|degree|btech|b\.tech|cgpa|gpa/)) {
         return '🎓 ' + (p.education || []).map((e) => `${[e.degree, e.area].filter(Boolean).join(', ')} — ${e.institution}${span(e.start, e.end) ? ` (${span(e.start, e.end)})` : ''}`).join('\n');
     }
-    if (msg.match(/experience|work|job|intern|career|role|position/)) {
+    // Before experience, so "open to internships?" / "available for work?" read as availability, not a job list.
+    if (msg.match(/contact|reach|email|mail|linkedin|connect|\bhir(e|ing)\b|availab|open (to|for)|looking for|opportunit/)) {
+        return `📬 ${b.availability || 'Open to opportunities'}! Reach ${first} via:\n${contactLine}\nOr use the contact form on this page. 🤝`;
+    }
+    if (msg.match(/experience|work|job|intern|hired|career|role|position/)) {
         return '💼 ' + (p.experience || []).map((e) => `${e.title} at ${e.company} (${span(e.start, e.end)})`).join('\n');
     }
     if (msg.match(/certif|course|credential|oracle|deloitte/)) {
@@ -462,9 +466,6 @@ function getLocalBoogluResponse(message) {
     }
     if (msg.match(/skill|stack|tech|language|framework|tools|know/)) {
         return '💡 ' + (p.skills || []).map((s) => `${s.category}: ${s.items.join(', ')}`).join('\n');
-    }
-    if (msg.match(/contact|reach|email|mail|linkedin|connect|hire|internship|available|opportunit/)) {
-        return `📬 ${b.availability || 'Open to opportunities'}! Reach ${first} via:\n${contactLine}\nOr use the contact form on this page. 🤝`;
     }
     if (msg.match(/where|location|live|city|based|from/)) {
         return `📍 ${first} is based in ${b.location}${b.hometown ? `, originally from ${b.hometown}` : ''}. 🌍`;
