@@ -14,3 +14,4 @@ This repository is **public**. Upload only:
 `Positions.csv`, `Education.csv`, `Certifications.csv`, `Skills.csv`, `Projects.csv`, `Honors.csv`
 
 **Never** upload the whole export ZIP or `Profile.csv`. They contain your messages, connections, email, address and birth date. The workflow deletes anything else it finds in `sources/linkedin/`, but a file you push stays in git history.
+RESUME will be added soon.
