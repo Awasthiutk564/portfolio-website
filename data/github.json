@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28T16:43:10Z",
+  "generated_at": "2026-10-28T21:44:07Z",
   "user": {
     "login": "Awasthiutk564",
     "url": "https://github.com/Awasthiutk564",
@@ -28,23 +28,6 @@
   },
   "repos": [
     {
-      "name": "Awasthiutk564",
-      "url": "https://github.com/Awasthiutk564/Awasthiutk564",
-      "homepage": null,
-      "description": null,
-      "language": "Python",
-      "languages": [
-        "Python"
-      ],
-      "topics": [],
-      "stars": 3,
-      "forks": 0,
-      "fork": false,
-      "archived": false,
-      "created_at": "2025-11-30T07:42:17Z",
-      "pushed_at": "2026-10-28T12:57:15Z"
-    },
-    {
       "name": "portfolio-website",
       "url": "https://github.com/Awasthiutk564/portfolio-website",
       "homepage": "https://utkarsh-awasthi.vercel.app/",
@@ -63,7 +46,24 @@
       "fork": false,
       "archived": false,
       "created_at": "2026-03-03T09:12:48Z",
-      "pushed_at": "2026-10-28T09:50:44Z"
+      "pushed_at": "2026-10-28T16:43:12Z"
+    },
+    {
+      "name": "Awasthiutk564",
+      "url": "https://github.com/Awasthiutk564/Awasthiutk564",
+      "homepage": null,
+      "description": null,
+      "language": "Python",
+      "languages": [
+        "Python"
+      ],
+      "topics": [],
+      "stars": 3,
+      "forks": 0,
+      "fork": false,
+      "archived": false,
+      "created_at": "2025-11-30T07:42:17Z",
+      "pushed_at": "2026-10-28T12:57:15Z"
     },
     {
       "name": "Campus-Drop",
