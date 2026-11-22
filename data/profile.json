@@ -415,10 +415,10 @@
       "repos": 14,
       "stars": 28,
       "forks": 7,
-      "contributions": 329,
-      "active_days": 84,
-      "current_streak": 4,
-      "longest_streak": 18
+      "contributions": 316,
+      "active_days": 78,
+      "current_streak": 1,
+      "longest_streak": 11
     },
     "languages": {
       "C": 33497028,
@@ -431,34 +431,6 @@
       "TeX": 360
     },
     "contributions": [
-      {
-        "date": "2025-11-16",
-        "count": 2
-      },
-      {
-        "date": "2025-11-17",
-        "count": 6
-      },
-      {
-        "date": "2025-11-18",
-        "count": 4
-      },
-      {
-        "date": "2025-11-19",
-        "count": 1
-      },
-      {
-        "date": "2025-11-20",
-        "count": 1
-      },
-      {
-        "date": "2025-11-21",
-        "count": 1
-      },
-      {
-        "date": "2025-11-22",
-        "count": 1
-      },
       {
         "date": "2025-11-23",
         "count": 1
@@ -1914,16 +1886,20 @@
       {
         "date": "2026-11-21",
         "count": 0
+      },
+      {
+        "date": "2026-11-22",
+        "count": 3
       }
     ]
   },
   "_meta": {
-    "built_at": "2026-11-21T19:29:16Z",
+    "built_at": "2026-11-22T00:27:47Z",
     "sources": {
       "manual": true,
       "linkedin": null,
       "resume": null,
-      "github": "2026-11-21T19:29:16Z"
+      "github": "2026-11-22T00:27:47Z"
     },
     "resume_pdf": false
   }
